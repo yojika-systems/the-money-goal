@@ -39,4 +39,11 @@
 # --- The committed dist/ directory was published at the repo root -----------
 # Every page had a complete duplicate: /dist/learn returned 200 with the full
 # 56,040-byte page and no canonical tag. Collapse the tree onto the real URL.
-/dist/*            /:splat                301
+#
+# The three consolidated URLs are listed before the splat so they resolve in ONE
+# hop — /dist/learn -> /guides, not /dist/learn -> /learn -> /guides. First
+# match wins, so the order of these four lines is load-bearing.
+/dist/learn               /guides    301
+/dist/knowledge-hub       /guides    301
+/dist/alice-blue-partner  /partner   301
+/dist/*                   /:splat    301
