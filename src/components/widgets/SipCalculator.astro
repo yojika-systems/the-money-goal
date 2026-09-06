@@ -1,0 +1,171 @@
+---
+/* The SIP calculator.
+ *
+ * The assumptions are the CONTROLS, not hidden constants. The old version
+ * hardcoded 12% p.a. over 15 years with no way to change either and no note
+ * saying so; the homepage chart did the same against a 3.5% bank rate. Making
+ * the return and the fee draggable is the whole editorial position of the site
+ * expressed as an interface.
+ */
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+
+<div class="border border-rule bg-surface" id="sip-calc">
+  <div class="grid lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div class="border-b border-rule lg:border-b-0 lg:border-r">
+      <div class="border-b border-rule px-7 pb-4 pt-5">
+        <h2 class="font-serif text-[20px] font-semibold">What you plan to do</h2>
+      </div>
+      <div class="px-7 pb-2 pt-6">
+        <div class="mb-7">
+          <div class="mb-2.5 flex items-baseline justify-between">
+            <label for="sip-amount" class="text-sm text-ink3">Monthly investment</label>
+            <span class="num text-[19px] font-semibold" id="sip-amount-out">&#8377;15,000</span>
+          </div>
+          <input type="range" id="sip-amount" min="1000" max="100000" step="1000" value="15000" class="h-1 w-full cursor-pointer accent-[#0B5C3F]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>&#8377;1,000</span><span>&#8377;1,00,000</span></div>
+        </div>
+        <div class="mb-7">
+          <div class="mb-2.5 flex items-baseline justify-between">
+            <label for="sip-years" class="text-sm text-ink3">For how long</label>
+            <span class="num text-[19px] font-semibold" id="sip-years-out">15 years</span>
+          </div>
+          <input type="range" id="sip-years" min="1" max="30" step="1" value="15" class="h-1 w-full cursor-pointer accent-[#0B5C3F]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>1 yr</span><span>30 yr</span></div>
+        </div>
+      </div>
+
+      <div class="border-t border-rule bg-tint2 px-7 pb-7 pt-5">
+        <div class="mb-1.5 flex items-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8442A" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><circle cx="12" cy="7.8" r="0.7" fill="#A8442A"></circle></svg>
+          <span class="text-xs font-semibold uppercase tracking-[0.07em] text-caveat">Assumptions — change these</span>
+        </div>
+        <p class="mb-6 text-[13.5px] leading-[1.65] text-muted">
+          Most calculators fix these silently. They are the answer&rsquo;s biggest lever.
+        </p>
+        <div class="mb-6">
+          <div class="mb-2.5 flex items-baseline justify-between">
+            <label for="sip-return" class="text-sm text-ink3">Assumed annual return</label>
+            <span class="num text-[19px] font-semibold text-caveat" id="sip-return-out">12.0%</span>
+          </div>
+          <input type="range" id="sip-return" min="4" max="18" step="0.5" value="12" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>4%</span><span>18%</span></div>
+        </div>
+        <div>
+          <div class="mb-2.5 flex items-baseline justify-between">
+            <label for="sip-fee" class="text-sm text-ink3">Fund expense ratio</label>
+            <span class="num text-[19px] font-semibold text-caveat" id="sip-fee-out">0.20%</span>
+          </div>
+          <input type="range" id="sip-fee" min="0.05" max="2.25" step="0.05" value="0.2" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>0.05%</span><span>2.25%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <dl class="grid border-b border-rule sm:grid-cols-3">
+        <div class="border-b border-rule px-7 py-6 sm:border-b-0 sm:border-r">
+          <dt class="mb-3 text-[12.5px] uppercase tracking-[0.07em] text-muted">You put in</dt>
+          <dd class="num font-serif text-[30px] font-bold leading-none" id="sip-invested">&#8377;27.0 L</dd>
+          <dd class="num mt-2 text-[13.5px] text-muted" id="sip-invested-note">&#8377;15,000 &times; 180 months</dd>
+        </div>
+        <div class="border-b border-rule px-7 py-6 sm:border-b-0 sm:border-r">
+          <dt class="mb-3 text-[12.5px] uppercase tracking-[0.07em] text-muted">It could become</dt>
+          <dd class="num font-serif text-[30px] font-bold leading-none text-green" id="sip-value">&#8377;74.3 L</dd>
+          <dd class="num mt-2 text-[13.5px] text-muted" id="sip-value-note">after the 0.20% fee</dd>
+        </div>
+        <div class="px-7 py-6">
+          <dt class="mb-3 text-[12.5px] uppercase tracking-[0.07em] text-muted">Cost of the fee</dt>
+          <dd class="num font-serif text-[30px] font-bold leading-none text-caveat" id="sip-feecost">&#8377;1.4 L</dd>
+          <dd class="num mt-2 text-[13.5px] text-muted">versus a zero-fee fund</dd>
+        </div>
+      </dl>
+
+      <div class="px-7 py-6">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="text-[12.5px] uppercase tracking-[0.07em] text-muted">Year by year</span>
+          <span class="flex gap-5 text-[13px] text-ink3">
+            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 bg-green"></span>Value</span>
+            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 bg-[#C9DCD1]"></span>Invested</span>
+          </span>
+        </div>
+        <div class="flex h-[170px] items-end gap-1.5" id="sip-chart" aria-hidden="true"></div>
+        <div class="num mt-2.5 flex justify-between text-xs text-faint" id="sip-axis"></div>
+      </div>
+
+      <div class="grid border-t border-rule sm:grid-cols-2">
+        <div class="border-b border-rule px-7 py-6 sm:border-b-0 sm:border-r">
+          <div class="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-green">What this assumes</div>
+          <p class="text-[14.5px] leading-[1.72] text-ink3" id="sip-assumes"></p>
+        </div>
+        <div class="bg-caveat-bg px-7 py-6">
+          <div class="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-caveat">What it ignores</div>
+          <p class="text-[14.5px] leading-[1.72] text-ink3">
+            Inflation, so the figure will not buy then what it buys today. Capital gains tax on
+            redemption. Exit loads. And that real returns arrive unevenly — a bad first decade
+            changes the outcome even when the average holds.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { futureValue, inr, inrCompact } from '../../lib/finance.js';
+
+  const root = document.getElementById('sip-calc');
+  if (root) {
+    const el = (id) => document.getElementById(id);
+    const inputs = ['sip-amount', 'sip-years', 'sip-return', 'sip-fee'].map(el);
+
+    const render = () => {
+      const monthly = Number(el('sip-amount').value);
+      const years = Number(el('sip-years').value);
+      const gross = Number(el('sip-return').value) / 100;
+      const fee = Number(el('sip-fee').value) / 100;
+      // A fund's expense ratio is deducted from assets, so it lowers the
+      // realised return rather than being a separate charge.
+      const net = gross - fee;
+      const invested = monthly * years * 12;
+      const value = futureValue(monthly, net, years);
+      const noFee = futureValue(monthly, gross, years);
+
+      el('sip-amount-out').textContent = inr(monthly);
+      el('sip-years-out').textContent = `${years} year${years === 1 ? '' : 's'}`;
+      el('sip-return-out').textContent = (gross * 100).toFixed(1) + '%';
+      el('sip-fee-out').textContent = (fee * 100).toFixed(2) + '%';
+      el('sip-invested').textContent = inrCompact(invested);
+      el('sip-invested-note').textContent = `${inr(monthly)} × ${years * 12} months`;
+      el('sip-value').textContent = inrCompact(value);
+      el('sip-value-note').textContent = `after the ${(fee * 100).toFixed(2)}% fee`;
+      el('sip-feecost').textContent = inrCompact(noFee - value);
+      el('sip-assumes').textContent =
+        `You invest ${inr(monthly)} on the same day every month for ${years} years without missing one, starting from zero. The fund returns a constant ${(gross * 100).toFixed(1)}% a year before fees, and ${(fee * 100).toFixed(2)}% is deducted annually.`;
+
+      // Bars: value stacked over amount invested, both scaled to the final value.
+      const chart = el('sip-chart');
+      chart.innerHTML = '';
+      const step = Math.max(1, Math.ceil(years / 15));
+      const marks = [];
+      for (let y = step; y <= years; y += step) marks.push(y);
+      if (marks[marks.length - 1] !== years) marks.push(years);
+      const peak = futureValue(monthly, net, years);
+      for (const y of marks) {
+        const v = futureValue(monthly, net, y);
+        const inv = monthly * y * 12;
+        const col = document.createElement('div');
+        col.className = 'flex flex-1 flex-col justify-end h-full';
+        col.innerHTML =
+          `<div style="height:${(v / peak) * 100}%" class="bg-green"></div>` +
+          `<div style="height:${(inv / peak) * 100}%" class="bg-[#C9DCD1]"></div>`;
+        chart.appendChild(col);
+      }
+      el('sip-axis').innerHTML = `<span>Year ${marks[0]}</span><span>Year ${years}</span>`;
+    };
+
+    for (const input of inputs) input.addEventListener('input', render);
+    render();
+  }
+</script>

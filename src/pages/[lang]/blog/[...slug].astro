@@ -1,0 +1,23 @@
+---
+/* Translated articles at /<lang>/blog/<slug>.
+ *
+ * Astro's post.slug for src/content/blog/hi/foo.md is "hi/foo", so the language
+ * segment is stripped before it becomes the route param — the language is
+ * already the first path segment. */
+import Article from '../../../layouts/Article.astro';
+import { getCollection } from 'astro:content';
+import { DEFAULT_LANG , stripLangPrefix} from '../../../lib/languages.js';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang !== DEFAULT_LANG);
+  return posts.map((post) => ({
+    params: { lang: post.data.lang, slug: stripLangPrefix(post.slug) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+---
+
+<Article post={post} headings={headings}><Content /></Article>

@@ -63,3 +63,13 @@ export const listingHref = (code) => `${langPrefix(code)}/blog`;
 
 /** The article URL for a slug in a language: /blog/x, /hi/blog/x. */
 export const articleHref = (code, slug) => `${langPrefix(code)}/blog/${slug}`;
+
+/**
+ * Strip a leading language directory from a content slug: "hi/foo" -> "foo".
+ *
+ * Exists as a helper rather than an inline regex because the Astro compiler
+ * mis-parses the `{2}` quantifier inside a regex literal in TEMPLATE position —
+ * it reads the brace as a JSX expression boundary and fails with a syntax error.
+ * Safe in frontmatter, breaks the build inside markup. Call this instead.
+ */
+export const stripLangPrefix = (slug) => slug.replace(/^[a-z]{2}\//, '');

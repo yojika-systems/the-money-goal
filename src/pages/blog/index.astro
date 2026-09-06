@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { dmyLong } from '../../lib/format.js';
+import { LANGUAGES, DEFAULT_LANG, articleHref, langName } from '../../lib/languages.js';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === DEFAULT_LANG))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+/* Which languages actually have at least one published article — the switcher
+ * only offers a language that has something to show. */
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const populated = new Set(all.map((p) => p.data.lang));
+---
+
+<Base
+  title="Latest explainers | The MoneyGoal"
+  description="New plain-language financial explainers for Indian readers, published in twelve languages. Free, with sources and stated assumptions."
+>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <h1 class="mb-4 font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[46px]">
+        Latest explainers
+      </h1>
+      <p class="max-w-[660px] text-[17px] leading-[1.7] text-ink3 md:text-[18px]">
+        Every article states its sources and its assumptions. Free to read, no account, nothing
+        collected about you.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-12 md:px-10 lg:px-20">
+    {
+      populated.size > 1 && (
+        <div class="mb-9 flex flex-wrap items-center gap-2.5 border-b border-rule pb-7">
+          <span class="mr-1 text-xs uppercase tracking-[0.07em] text-muted">Language</span>
+          {LANGUAGES.filter((l) => populated.has(l.code)).map((l) =>
+            l.code === DEFAULT_LANG ? (
+              <span class="bg-ink px-3.5 py-2 text-[14px] text-paper">{l.name}</span>
+            ) : (
+              <a href={`/${l.code}/blog`} lang={l.code} class="border border-rule bg-surface px-3.5 py-2 text-[14px] text-ink3 hover:border-ink">
+                {l.name}
+              </a>
+            ),
+          )}
+        </div>
+      )
+    }
+
+    {
+      posts.length === 0 ? (
+        <p class="text-[16px] leading-[1.7] text-ink3">
+          No explainers published yet. The guides at <a href="/guides">/guides</a> are the place to start.
+        </p>
+      ) : (
+        posts.map((post) => (
+          <a href={articleHref(DEFAULT_LANG, post.slug)} class="block border-b border-rule py-7">
+            <div class="mb-2.5 flex flex-wrap items-center gap-3">
+              <span class="text-[11.5px] uppercase tracking-[0.08em] text-green">{post.data.category}</span>
+              <span class="text-[13px] text-faint">{dmyLong(post.data.pubDate)}</span>
+            </div>
+            <h2 class="mb-2 font-serif text-[25px] font-semibold leading-[1.3] text-ink">{post.data.title}</h2>
+            <p class="max-w-[720px] text-[15.5px] leading-[1.68] text-ink3">{post.data.description}</p>
+          </a>
+        ))
+      )
+    }
+  </section>
+</Base>

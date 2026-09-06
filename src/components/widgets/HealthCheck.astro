@@ -1,0 +1,91 @@
+---
+/* Weighted self-check. Plain <script>, no framework: it reads checkboxes and
+ * writes textContent, which is all six of this site's widgets ever do.
+ *
+ * Astro bundles and hashes this script into /_astro/*.js. It deliberately does
+ * NOT use define:vars — that would force is:inline, un-bundling the script and
+ * requiring a CSP hash later. Config rides on data-* attributes instead, read
+ * from the DOM, so the script stays bundleable and CSP-clean.
+ */
+import { HEALTH_ITEMS, HEALTH_BANDS } from '../../lib/health-check.js';
+---
+
+<form
+  class="border border-rule bg-surface"
+  id="health-check"
+  data-bands={JSON.stringify(HEALTH_BANDS)}
+  aria-labelledby="health-check-title"
+>
+  <div class="border-b border-rule px-7 pb-4 pt-5">
+    <h2 id="health-check-title" class="font-serif text-[21px] font-semibold">
+      Select what is true today
+    </h2>
+    <p class="mt-1.5 text-[13.5px] text-muted">
+      There are no perfect finances. Answer honestly to get a useful starting point.
+    </p>
+  </div>
+
+  <div class="flex flex-col px-7 py-2">
+    {
+      HEALTH_ITEMS.map((item, i) => (
+        <label class="flex cursor-pointer items-start gap-3.5 border-b border-rule2 py-4 last:border-b-0">
+          <input
+            type="checkbox"
+            data-weight={item.weight}
+            id={`health-${i}`}
+            class="mt-0.5 h-[18px] w-[18px] shrink-0 accent-[#0B5C3F]"
+          />
+          <span class="text-[15.5px] leading-[1.6] text-ink3">{item.label}</span>
+        </label>
+      ))
+    }
+  </div>
+
+  <output
+    class="block border-t border-rule bg-tint2 px-7 py-6"
+    for="health-check"
+    aria-live="polite"
+  >
+    <div class="mb-3 flex items-baseline justify-between">
+      <span class="text-xs uppercase tracking-[0.08em] text-muted">Where you are</span>
+      <span class="num font-serif text-[30px] font-bold text-green"
+        ><span id="health-score">0</span><span class="text-[18px] text-muted">/100</span></span
+      >
+    </div>
+    <div class="h-1 w-full bg-rule">
+      <div id="health-bar" class="h-1 bg-green transition-[width] duration-300" style="width:0%"></div>
+    </div>
+    <div class="mt-4 text-[15.5px] font-semibold" id="health-band">Answer the statements above</div>
+    <p class="mt-1.5 text-[14.5px] leading-[1.68] text-ink3" id="health-guidance">
+      Nothing you tick is stored or sent anywhere — this runs entirely in your browser.
+    </p>
+    <a class="mt-3 inline-block text-sm font-medium" id="health-next" href="/guides" hidden>Next step</a>
+  </output>
+</form>
+
+<script>
+  const form = document.getElementById('health-check');
+  if (form) {
+    const bands = JSON.parse(form.dataset.bands || '[]');
+    const score = document.getElementById('health-score');
+    const bar = document.getElementById('health-bar');
+    const band = document.getElementById('health-band');
+    const guidance = document.getElementById('health-guidance');
+    const next = document.getElementById('health-next');
+
+    form.addEventListener('change', () => {
+      const total = [...form.querySelectorAll('input:checked')].reduce(
+        (sum, input) => sum + Number(input.dataset.weight || 0),
+        0,
+      );
+      score.textContent = String(total);
+      bar.style.width = total + '%';
+      const match = bands.find((b) => total <= b.max) ?? bands[bands.length - 1];
+      band.textContent = match.band;
+      guidance.textContent = match.guidance;
+      next.href = match.href;
+      next.textContent = match.cta + ' →';
+      next.hidden = false;
+    });
+  }
+</script>

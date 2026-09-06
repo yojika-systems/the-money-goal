@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import FreedomPlanner from '../components/widgets/FreedomPlanner.astro';
+import { LADDER } from '../lib/ladder.js';
+
+const title = 'Financial freedom — the number you are actually aiming for';
+const description =
+  'The Rule of 25, the 4% withdrawal rule, and an eight-stage ladder from paycheque-to-paycheque to independent. With a planner that shows every assumption beside the answer.';
+---
+
+<Base title={`${title} | The MoneyGoal`} description={description}>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Planning</div>
+      <h1 class="mb-6 max-w-[900px] font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
+        The number you are actually aiming for
+      </h1>
+      <p class="max-w-[640px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+        &ldquo;Enough&rdquo; is not a feeling, it is an arithmetic result. Work out what yours is,
+        see the stages between here and there, and watch what changes when you move one lever.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <div class="grid items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <h2 class="mb-4 font-serif text-[28px] font-bold leading-[1.2] tracking-tight">
+          The core arithmetic
+        </h2>
+        <p class="mb-4 text-[15.5px] leading-[1.72] text-ink3">
+          The <strong class="text-ink">Rule of 25</strong> says a portfolio of 25&times; your annual
+          spending can, on historical assumptions, sustain that spending indefinitely. It is the
+          same statement as the <strong class="text-ink">4% rule</strong> — withdraw 4% a year and
+          the remainder is expected to keep growing.
+        </p>
+        <p class="mb-4 text-[15.5px] leading-[1.72] text-ink3">
+          Two things follow, and the second is the one people miss. Investing more brings the date
+          closer. But <em>spending less permanently</em> brings it closer twice over: it raises what
+          you invest and lowers the target at the same time.
+        </p>
+        <p class="text-[15.5px] leading-[1.72] text-ink3">
+          Both rules come from studies of historical US market data over specific periods. They are
+          a planning starting point, not a guarantee, and they say nothing about the order in which
+          returns arrive.
+        </p>
+      </div>
+      <div class="lg:col-span-7"><FreedomPlanner /></div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <h2 class="mb-3 font-serif text-[28px] font-bold tracking-tight md:text-[34px]">
+      The eight-stage ladder
+    </h2>
+    <p class="mb-9 max-w-[640px] text-[16px] leading-[1.72] text-ink3">
+      Most people are somewhere on this ladder rather than at one end of it. The stages run in
+      order because each one makes the next survivable.
+    </p>
+    <ol class="grid gap-px border border-rule bg-rule md:grid-cols-2">
+      {
+        LADDER.map((stage, i) => (
+          <li class="bg-surface px-7 pb-7 pt-6">
+            <div class="mb-3 flex items-baseline gap-3">
+              <span class="num font-serif text-[15px] font-bold text-green">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="font-serif text-[21px] font-semibold leading-[1.3]">{stage.name}</h3>
+            </div>
+            <p class="text-[14.5px] leading-[1.7] text-ink3">{stage.description}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-9 border-l-[3px] border-caveat bg-caveat-bg px-6 py-5">
+      <p class="text-[14.5px] leading-[1.7] text-ink3">
+        <strong class="text-ink">Educational disclosure.</strong> This planner and ladder are for
+        self-directed financial education. They rest on hypothetical return assumptions which do not
+        guarantee future returns, and they are not personalised to your circumstances. The MoneyGoal
+        is not a SEBI-registered Investment Adviser or Research Analyst. Consider speaking to a
+        fee-only financial planner before acting on any of it.
+      </p>
+    </div>
+  </section>
+</Base>

@@ -33,10 +33,18 @@ const {
   jsonLd,
 } = Astro.props;
 
-/* Trailing slash stripped so the canonical is byte-identical to the URL
- * @astrojs/sitemap emits for the same page. When those two disagree Google has
- * to pick one, and scripts/check-build.mjs asserts they never do. */
-const canonicalPath = Astro.url.pathname.replace(/\/$/, '');
+/* The canonical must be byte-identical to the URL @astrojs/sitemap emits for
+ * the same page, or Google is asked to choose between two spellings of one URL.
+ *
+ * With build.format 'file' Astro renders to /calculators.html and reports that
+ * as Astro.url.pathname — but Cloudflare Pages serves it at /calculators and
+ * 308s the .html form away, which is also what the sitemap lists. So the
+ * extension and any index segment are stripped here. scripts/check-build.mjs
+ * asserts the two agree on every page. */
+const canonicalPath = Astro.url.pathname
+  .replace(/\/index\.html$/, '')
+  .replace(/\.html$/, '')
+  .replace(/\/$/, '');
 const canonicalUrl = canonical ?? new URL(canonicalPath, Astro.site).href.replace(/\/$/, '');
 
 /* Preview deployments must never be indexed. Pages sends X-Robots-Tag: noindex

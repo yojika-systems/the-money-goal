@@ -1,0 +1,17 @@
+---
+/* English articles at /blog/<slug>. Non-default languages are prefixed and
+ * handled by src/pages/[lang]/blog/[...slug].astro. */
+import Article from '../../layouts/Article.astro';
+import { getCollection } from 'astro:content';
+import { DEFAULT_LANG } from '../../lib/languages.js';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === DEFAULT_LANG);
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+---
+
+<Article post={post} headings={headings}><Content /></Article>

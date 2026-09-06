@@ -1,0 +1,208 @@
+---
+import Base from '../layouts/Base.astro';
+import PartnerCta from '../components/PartnerCta.astro';
+import { getCollection } from 'astro:content';
+import { dmyLong, iso } from '../lib/format.js';
+import { LANGUAGES, DEFAULT_LANG, articleHref, langName , stripLangPrefix} from '../lib/languages.js';
+import { SITE, OPERATOR, PARTNER } from '../lib/site.js';
+import { credentialLine, EDUCATION_ONLY, MARKET_RISK, AFFILIATE_SHORT } from '../lib/disclosures.js';
+
+interface Props { post: any; headings: { depth: number; slug: string; text: string }[] }
+const { post, headings } = Astro.props;
+const d = post.data;
+
+/* Every language variant of this article, joined by translationKey. This is
+ * what powers both the switcher and the hreflang alternates. */
+const family = d.translationKey
+  ? await getCollection('blog', (e: any) => !e.data.draft && e.data.translationKey === d.translationKey)
+  : [post];
+const byLang = new Map(family.map((e: any) => [e.data.lang, e]));
+const canonical = new URL(articleHref(d.lang, stripLangPrefix(post.slug)), SITE.url).href;
+const stem = stripLangPrefix(post.slug);
+const xDefault = byLang.get(DEFAULT_LANG) ?? post;
+
+const toc = headings.filter((h) => h.depth === 2);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      headline: d.title,
+      description: d.description,
+      datePublished: iso(d.pubDate),
+      dateModified: iso(d.updatedDate ?? d.pubDate),
+      inLanguage: d.lang,
+      author: { '@type': 'Person', name: d.author },
+      publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+      mainEntityOfPage: canonical,
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Guides', item: `${SITE.url}/guides` },
+        { '@type': 'ListItem', position: 2, name: d.title, item: canonical },
+      ],
+    },
+    ...(d.faq?.length
+      ? [{
+          '@type': 'FAQPage',
+          mainEntity: d.faq.map((f: any) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        }]
+      : []),
+  ],
+};
+---
+
+<Base
+  title={`${d.title} | The MoneyGoal`}
+  description={d.description}
+  canonical={canonical}
+  lang={d.lang}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <Fragment slot="head">
+    {
+      [...byLang.entries()].map(([code, entry]: any) => (
+        <link
+          rel="alternate"
+          hreflang={LANGUAGES.find((l) => l.code === code)?.hreflang ?? code}
+          href={new URL(articleHref(code, stem), SITE.url).href}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(articleHref(DEFAULT_LANG, stem), SITE.url).href} />
+  </Fragment>
+
+  {/* Breadcrumb + language switcher */}
+  <div class="border-b border-rule bg-tint px-5 py-3 md:px-10 lg:px-20">
+    <div class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3">
+      <nav class="text-[13.5px] text-muted" aria-label="Breadcrumb">
+        <a href="/guides" class="text-muted hover:text-ink">Guides</a> / <span class="text-ink">{d.category}</span>
+      </nav>
+      {
+        byLang.size > 1 && (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs uppercase tracking-[0.07em] text-muted">Also in</span>
+            {LANGUAGES.filter((l) => byLang.has(l.code)).map((l) =>
+              l.code === d.lang ? (
+                <span class="bg-ink px-2.5 py-1 text-[13.5px] text-paper" lang={l.code}>{l.name}</span>
+              ) : (
+                <a href={articleHref(l.code, stem)} lang={l.code} class="border border-rule bg-surface px-2.5 py-1 text-[13.5px] text-ink3 hover:border-ink">
+                  {l.name}
+                </a>
+              ),
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="mx-auto grid max-w-[1440px] items-start gap-12 px-5 py-14 md:px-10 lg:grid-cols-[240px_minmax(0,1fr)_290px] lg:px-20">
+    {/* TOC */}
+    <nav class="hidden lg:block" aria-label="On this page">
+      <div class="mb-4 border-b border-rule pb-3 text-xs uppercase tracking-[0.08em] text-muted">On this page</div>
+      <ul class="flex flex-col gap-3 text-[14.5px] leading-[1.5]">
+        {toc.map((h) => (
+          <li><a href={`#${h.slug}`} class="block border-l-2 border-rule pl-3 text-ink3 hover:border-green hover:text-ink">{h.text}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <article>
+      <div class="mb-4 text-[12.5px] uppercase tracking-[0.09em] text-green">{d.category}</div>
+      <h1 class="mb-5 font-serif text-[34px] font-bold leading-[1.14] tracking-tight md:text-[50px]">{d.title}</h1>
+      <p class="mb-7 font-serif text-[19px] italic leading-[1.6] text-ink3 md:text-[22px]">{d.description}</p>
+
+      <div class="mb-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-rule py-4 text-[13.5px] text-muted">
+        <span>By <span class="font-medium text-ink">{d.author}</span></span>
+        <span>Published <time datetime={iso(d.pubDate)}>{dmyLong(d.pubDate)}</time></span>
+        {d.updatedDate && <span>Updated <time datetime={iso(d.updatedDate)}>{dmyLong(d.updatedDate)}</time></span>}
+      </div>
+
+      {/* Compliance as a first-class element, above the body. */}
+      <div class="mb-8 border-l-[3px] border-caveat bg-caveat-bg px-5 py-4">
+        <p class="text-[13.5px] leading-[1.68] text-ink3">
+          <span class="font-semibold text-ink">Education, not advice.</span> {EDUCATION_ONLY}
+        </p>
+      </div>
+
+      {
+        d.affiliate && (
+          <div class="mb-8 border border-rule bg-tint px-5 py-4">
+            <p class="text-[13.5px] leading-[1.68] text-ink3">
+              <span class="font-semibold text-ink">This article contains a partner link.</span> {AFFILIATE_SHORT}
+            </p>
+          </div>
+        )
+      }
+
+      <div class="prose prose-lg max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-p:leading-[1.78] prose-p:text-ink2 prose-li:text-ink2 prose-a:text-green prose-strong:text-ink prose-th:text-muted">
+        <slot />
+      </div>
+
+      {
+        d.affiliate && (
+          <PartnerCta variant="inline" heading="You need a demat account to buy direct plans yourself" class="mt-9">
+            Compare at least two brokers before you choose. If you pick {PARTNER.displayName}, this
+            link opens the account through us.
+          </PartnerCta>
+        )
+      }
+
+      {
+        d.sources?.length > 0 && (
+          <section class="mt-10 border-t border-rule pt-6">
+            <h2 class="mb-4 text-xs uppercase tracking-[0.08em] text-muted">Sources</h2>
+            <ol class="flex flex-col gap-3 text-[14.5px] leading-[1.6]">
+              {d.sources.map((s: any, i: number) => (
+                <li class="flex gap-3">
+                  <span class="num text-muted">{i + 1}.</span>
+                  <span>
+                    {s.url ? <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a> : <span class="text-ink">{s.title}</span>}
+                    <span class="text-muted"> &middot; {s.publisher}{s.accessed && ` · accessed ${dmyLong(s.accessed)}`}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
+    </article>
+
+    {/* Author rail */}
+    <aside class="flex flex-col gap-6">
+      <div class="border border-rule bg-surface px-6 py-6">
+        <div class="mb-4 text-xs uppercase tracking-[0.08em] text-muted">Written by</div>
+        <div class="mb-3.5 flex items-start gap-3.5">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center bg-ink text-paper">
+            <span class="font-serif text-[17px] font-bold">{OPERATOR.initials}</span>
+          </div>
+          <div>
+            <div class="text-[15.5px] font-semibold leading-[1.35]">{OPERATOR.name}</div>
+            <div class="text-[13.5px] leading-[1.5] text-muted">{OPERATOR.role}</div>
+          </div>
+        </div>
+        <p class="border-t border-rule pt-3.5 text-[13px] leading-[1.68] text-ink3">{credentialLine()}</p>
+      </div>
+      <div class="border border-rule bg-surface px-6 py-6">
+        <div class="mb-4 text-xs uppercase tracking-[0.08em] text-muted">Try the numbers</div>
+        <div class="mb-2 font-serif text-[17px] font-semibold leading-[1.35]">SIP calculator</div>
+        <p class="mb-4 text-[13.5px] leading-[1.65] text-ink3">Change the return, the tenure and the fee, and watch the gap open up.</p>
+        <a href="/calculators" class="text-sm font-medium">Open the calculator &rarr;</a>
+      </div>
+    </aside>
+  </div>
+
+  <div class="border-t border-rule bg-tint px-5 py-9 md:px-10 lg:px-20">
+    <p class="mx-auto max-w-[1000px] text-[13px] leading-[1.72] text-ink3">
+      <span class="font-semibold text-ink">{MARKET_RISK}</span>
+    </p>
+  </div>
+</Base>
