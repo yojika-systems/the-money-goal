@@ -1,0 +1,10 @@
+# Build output. Previously committed and published as a full duplicate of the
+# site at /dist/* — see _redirects.
+dist/
+
+node_modules/
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
