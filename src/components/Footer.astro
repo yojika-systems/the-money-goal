@@ -1,0 +1,65 @@
+---
+import Logo from './Logo.astro';
+import { FOOTER_NAV } from '../lib/nav.js';
+import { SITE } from '../lib/site.js';
+import { EDUCATION_ONLY, MARKET_RISK, AFFILIATE_SHORT, credentialLine } from '../lib/disclosures.js';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-rule bg-tint">
+  <div class="mx-auto max-w-[1440px] px-5 py-12 md:px-10 lg:px-20">
+    <div class="grid gap-10 border-b border-rule pb-9 md:grid-cols-2 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <div class="mb-3.5 flex items-center gap-2.5">
+          <Logo class="h-[26px] w-[26px]" />
+          <span class="font-serif text-[18px] font-bold">The Money<span class="text-green">Goal</span></span>
+        </div>
+        <p class="max-w-[300px] text-sm leading-[1.68] text-ink3">
+          Financial education for people who were never taught it. Free, in twelve languages.
+        </p>
+      </div>
+
+      {
+        Object.entries(FOOTER_NAV).map(([heading, links]) => (
+          <div class="lg:col-span-2">
+            <div class="mb-3.5 text-xs uppercase tracking-[0.08em] text-muted">{heading}</div>
+            <div class="flex flex-col gap-2.5 text-[14.5px]">
+              {links.map((l) => (
+                <a href={l.href} class="text-ink3 transition-colors hover:text-ink">
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+
+      <div class="lg:col-span-2">
+        <div class="mb-3.5 text-xs uppercase tracking-[0.08em] text-muted">Site</div>
+        <div class="flex flex-col gap-2.5 text-[14.5px]">
+          <a href="/guides" class="text-ink3 transition-colors hover:text-ink">All guides</a>
+          <a href="/blog" class="text-ink3 transition-colors hover:text-ink">Latest explainers</a>
+          <a href="/rss.xml" class="text-ink3 transition-colors hover:text-ink">RSS feed</a>
+        </div>
+      </div>
+    </div>
+
+    {/* Compliance is served HTML here, not injected by script as it was before. */}
+    <div class="grid gap-10 pt-7 lg:grid-cols-12">
+      <div class="text-[13px] leading-[1.72] text-ink3 lg:col-span-8">
+        <p class="mb-4">
+          <span class="font-semibold text-ink">Education only, not investment advice.</span>{' '}
+          {EDUCATION_ONLY} {credentialLine()} {AFFILIATE_SHORT}
+        </p>
+        <p>
+          <span class="font-semibold text-ink">{MARKET_RISK}</span>{' '}
+          Complaints about a broking account go to Alice Blue, then the exchange, then SEBI SCORES.
+        </p>
+      </div>
+      <div class="text-[13px] leading-[1.72] text-muted lg:col-span-4">
+        &copy; {year} {SITE.name}.<br />Made in India.
+      </div>
+    </div>
+  </div>
+</footer>

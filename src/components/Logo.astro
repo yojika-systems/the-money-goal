@@ -1,0 +1,12 @@
+---
+/* The brand mark, inline so it needs no request and recolours with the theme.
+ * Replaces a 334KB, 1972px-wide PNG that was loaded twice on every page while
+ * an unused 587-byte SVG of the same mark sat beside it in the repo. */
+interface Props { class?: string }
+const { class: className = 'h-[26px] w-[26px]' } = Astro.props;
+---
+<svg class={className} viewBox="0 6 44 44" role="img" aria-label="The MoneyGoal">
+  <rect width="44" height="44" y="6" rx="10" fill="#16130F"></rect>
+  <path d="M14 34L22 18L30 34" stroke="#5FBF92" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+  <path d="M12 28H32" stroke="#FBFAF7" stroke-width="2.5" stroke-linecap="round"></path>
+</svg>

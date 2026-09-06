@@ -1,0 +1,99 @@
+---
+/* The document shell. Everything that has to be in the served HTML for a
+ * crawler — title, description, canonical, OG, structured data, the nav and
+ * the disclosures — is server-rendered here. The previous site built its
+ * header, footer and every disclosure with JavaScript on load, so a crawler
+ * saw a page with no navigation and no compliance text at all.
+ */
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE } from '../lib/site.js';
+
+interface Props {
+  title: string;
+  /* Required with NO default, deliberately: four of the old site's nine pages
+   * shipped without a meta description, and they were the four biggest. A page
+   * cannot be added here without writing one. */
+  description: string;
+  canonical?: string;
+  lang?: string;
+  noindex?: boolean;
+  ogType?: string;
+  jsonLd?: unknown;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  lang = 'en',
+  noindex = false,
+  ogType = 'website',
+  jsonLd,
+} = Astro.props;
+
+/* Trailing slash stripped so the canonical is byte-identical to the URL
+ * @astrojs/sitemap emits for the same page. When those two disagree Google has
+ * to pick one, and scripts/check-build.mjs asserts they never do. */
+const canonicalPath = Astro.url.pathname.replace(/\/$/, '');
+const canonicalUrl = canonical ?? new URL(canonicalPath, Astro.site).href.replace(/\/$/, '');
+
+/* Preview deployments must never be indexed. Pages sends X-Robots-Tag: noindex
+ * on *.pages.dev already; this is the belt to that braces. */
+const isPreview =
+  import.meta.env.CF_PAGES_BRANCH !== undefined && import.meta.env.CF_PAGES_BRANCH !== 'main';
+
+/* JSON.stringify escapes quotes and backslashes but NOT "<". A frontmatter
+ * value containing a literal </script> would close the tag early and let the
+ * rest parse as HTML — stored XSS. With an auto-merging daily content pipeline
+ * writing these values, that is the live threat model, not a hypothetical. */
+const jsonLdScript = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {(noindex || isPreview) && <meta name="robots" content="noindex,follow" />}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#16130F" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
+
+    <slot name="head" />
+    {jsonLdScript && <script type="application/ld+json" set:html={jsonLdScript} />}
+  </head>
+  <body class="bg-paper text-ink">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+      >Skip to content</a
+    >
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+  </body>
+</html>

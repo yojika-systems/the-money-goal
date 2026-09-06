@@ -1,0 +1,90 @@
+---
+/* The affiliate call to action.
+ *
+ * Three things this fixes from the old site. The href is resolved at BUILD
+ * time, so it is correct in the served HTML — previously site.js rewrote it on
+ * load, which meant a no-JS visitor got a dead button and no crawler ever saw
+ * rel="sponsored". The disclosure renders ABOVE the button, which is what ASCI
+ * requires (a footer-only disclosure does not satisfy it). And if the referral
+ * URL were ever unset the component renders nothing at all rather than a broken
+ * link — the old code popped alert("configuration is pending") on every click.
+ */
+import { PARTNER } from '../lib/site.js';
+
+interface Props {
+  heading: string;
+  variant?: 'panel' | 'inline';
+  class?: string;
+}
+const { heading, variant = 'panel', class: className = '' } = Astro.props;
+const url = PARTNER.referralUrl?.trim();
+---
+
+{
+  url && (
+    <div
+      class:list={[
+        variant === 'panel' ? 'border border-ink bg-ink text-paper' : 'border border-rule bg-surface',
+        className,
+      ]}
+    >
+      <div
+        class:list={[
+          'flex items-center gap-2 px-5 py-2.5 md:px-10',
+          variant === 'panel' ? 'border-b border-[#3A342B]' : 'border-b border-rule bg-tint',
+        ]}
+      >
+        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-bright" />
+        <span
+          class:list={[
+            'text-[11.5px] font-semibold uppercase tracking-[0.08em]',
+            variant === 'panel' ? 'text-[#C9C2B4]' : 'text-ink3',
+          ]}
+        >
+          Paid partner link &middot; we receive {PARTNER.compensation}
+        </span>
+      </div>
+
+      <div class="grid items-center gap-8 px-5 py-8 md:px-10 lg:grid-cols-12">
+        <div class="lg:col-span-7">
+          <h2
+            class:list={[
+              'mb-3 font-serif text-[26px] font-bold leading-[1.2] tracking-tight md:text-[32px]',
+            ]}
+          >
+            {heading}
+          </h2>
+          <p
+            class:list={[
+              'max-w-[560px] text-[15.5px] leading-[1.7]',
+              variant === 'panel' ? 'text-[#C9C2B4]' : 'text-ink3',
+            ]}
+          >
+            <slot />
+          </p>
+        </div>
+        <div class="flex flex-col items-start gap-3 lg:col-span-5">
+          <a
+            href={url}
+            target="_blank"
+            rel={PARTNER.rel}
+            class:list={[
+              'px-7 py-4 text-base font-semibold transition-opacity hover:opacity-90',
+              variant === 'panel' ? 'bg-green-bright text-ink' : 'bg-green text-paper',
+            ]}
+          >
+            Open an account on {PARTNER.displayName}&rsquo;s website &rarr;
+          </a>
+          <span
+            class:list={[
+              'text-[13px] leading-[1.6]',
+              variant === 'panel' ? 'text-[#948C7E]' : 'text-muted',
+            ]}
+          >
+            You will leave The MoneyGoal and continue on {PARTNER.exitHost}.
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,28 @@
+---
+/* An inline compliance note, placed next to whatever it qualifies rather than
+ * at the bottom of the page. `caveat` is for assumptions behind a number;
+ * `education` is for the not-advice statement above an explainer.
+ */
+interface Props {
+  variant?: 'caveat' | 'education';
+  label?: string;
+  class?: string;
+}
+const { variant = 'caveat', label, class: className = '' } = Astro.props;
+const defaultLabel = variant === 'caveat' ? 'Assumes' : 'Education, not advice.';
+---
+
+<div
+  class:list={[
+    'text-[13.5px] leading-[1.68] text-ink3',
+    variant === 'education'
+      ? 'border-l-[3px] border-caveat bg-caveat-bg px-5 py-4'
+      : 'border-t border-dashed border-[#D8D1C3] pt-3.5',
+    className,
+  ]}
+>
+  <span class:list={['font-semibold', variant === 'education' ? 'text-ink' : 'text-caveat']}>
+    {label ?? defaultLabel}
+  </span>{' '}
+  <slot />
+</div>

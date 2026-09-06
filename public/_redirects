@@ -20,7 +20,15 @@
 # --- Aliases the old dev server mapped and site.js linked to ----------------
 # Both were soft-404s in production, not real pages.
 /home              /                      301
-/partner-program   /alice-blue-partner    301
+/partner-program   /partner               301
+
+# --- Consolidated in the Astro rebuild --------------------------------------
+# /learn and /knowledge-hub were two overlapping index pages: /learn advertised
+# 42 lessons that did not exist, /knowledge-hub listed nine teasers pointing
+# back at the same guides. One index at /guides replaces both.
+/learn               /guides                301
+/knowledge-hub       /guides                301
+/alice-blue-partner  /partner               301
 
 # --- The committed dist/ directory was published at the repo root -----------
 # Every page had a complete duplicate: /dist/learn returned 200 with the full
