@@ -9,8 +9,6 @@
     "knowledge-hub": "/knowledge-hub",
     "start-learning": "/learn",
     "money-mistakes": "/money-mistakes",
-    login: "/account?mode=login",
-    profile: "/account?mode=login",
     "partner-program": "/alice-blue-partner"
   };
 
@@ -33,7 +31,6 @@
       <nav class="mg-nav-links" aria-label="Primary navigation">${navItems.map(([label, href]) => `<a href="${href}"${currentPath === href ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>
       <div class="mg-header-actions">
         <a class="mg-partner-link" data-path="partner-program" href="/alice-blue-partner"${currentPath === "/alice-blue-partner" ? ' aria-current="page"' : ""}><span></span>Alice Blue Partner</a>
-        <a class="mg-login-link" data-path="login" href="/account?mode=login"${currentPath === "/account" ? ' aria-current="page"' : ""}>Login</a>
         <a class="mg-header-cta" data-path="start-learning" href="/learn">Start Learning</a>
       </div>
     </div>`;

@@ -15,9 +15,6 @@ const routes = {
   ,"/knowledge-hub": "knowledge-hub.html"
   ,"/alice-blue-partner": "alice-blue-partner.html"
   ,"/partner-program": "alice-blue-partner.html"
-  ,"/account": "account.html"
-  ,"/login": "account.html"
-  ,"/signup": "account.html"
 };
 const types = {
   ".html": "text/html; charset=utf-8",
