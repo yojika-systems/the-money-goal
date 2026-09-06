@@ -1,0 +1,271 @@
+---
+import Base from '../layouts/Base.astro';
+import PartnerCta from '../components/PartnerCta.astro';
+import { SITE, OPERATOR, PARTNER, chargesVerified } from '../lib/site.js';
+import { referralDisclosure, GRIEVANCE_PATH, MARKET_RISK } from '../lib/disclosures.js';
+
+/* Rows render "See Alice Blue's charges page" until the real figure is in
+ * site.js — a stated number here would be a claim about someone else's pricing. */
+const CHARGES = [
+  { label: 'Account opening', value: PARTNER.charges.accountOpening },
+  { label: 'Annual maintenance (AMC)', value: PARTNER.charges.annualMaintenance },
+  { label: 'Equity delivery brokerage', value: PARTNER.charges.equityDelivery },
+  { label: 'Intraday & F&O', value: PARTNER.charges.intradayAndFno },
+];
+
+const KYC = [
+  { n: 1, title: 'PAN card', detail: 'Must match your name exactly as on the bank account.' },
+  { n: 2, title: 'Aadhaar linked to your mobile', detail: 'The OTP-based e-sign will not work otherwise.' },
+  { n: 3, title: 'A cancelled cheque or bank statement', detail: 'For the account you will settle funds through.' },
+  { n: 4, title: 'A signature on white paper', detail: 'Plus a live selfie for in-person verification.' },
+  { n: 5, title: 'Income proof', detail: 'Only if you intend to trade derivatives.' },
+];
+
+const FACTS = [
+  { t: 'It costs you nothing extra', d: `You pay ${PARTNER.displayName}'s standard published charges whether you come through us or not.` },
+  { t: 'It is ongoing, not one-off', d: 'We receive a share of brokerage on trades, not a single sign-up fee. More trading means more for us.' },
+  { t: 'Which is why we say this', d: 'Frequent trading is how most retail investors lose money. Our incentive and your interest can diverge here.' },
+  { t: 'No content is sponsored', d: `${PARTNER.displayName} does not see, review or pay for anything we publish.` },
+];
+
+const REGISTRATION = [
+  { k: 'Operated by', v: OPERATOR.name },
+  { k: 'Relationship', v: `Authorised Person of ${PARTNER.legalName}` },
+  { k: 'Broker SEBI Reg.', v: PARTNER.sebiRegistration },
+  { k: 'Depository participant', v: PARTNER.dpRegistration },
+  { k: 'Partner code', v: PARTNER.partnerCode },
+  ...(OPERATOR.apRegistrationNumber
+    ? [{ k: 'AP registration no.', v: OPERATOR.apRegistrationNumber }]
+    : []),
+  { k: 'Partner since', v: PARTNER.partnerSinceLabel },
+  { k: 'We are not', v: 'a SEBI-registered Investment Adviser or Research Analyst' },
+];
+
+const title = `How we make money — ${PARTNER.displayName} partner disclosure`;
+const description = `The MoneyGoal is an authorised person of ${PARTNER.legalName}. What that means, what it pays us, and why you should read our guides more carefully because of it.`;
+---
+
+<Base title={title} description={description}>
+  {/* Honesty before the pitch. */}
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto grid max-w-[1440px] items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">
+          Partner disclosure &middot; {PARTNER.displayName}
+        </div>
+        <h1 class="mb-6 font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
+          How we earn, and why that should make you read more carefully, not less.
+        </h1>
+        <p class="mb-5 max-w-[600px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+          Everything on this site is free. Our only income is {PARTNER.compensation} that{' '}
+          {PARTNER.displayName} earns from people who open an account through our link. You should
+          know that before you read a single word of our guides.
+        </p>
+        <p class="max-w-[600px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+          <strong class="text-ink">You do not need to open anything to use this site.</strong> No
+          account, no signup, no email. If you never click the partner link, nothing here changes.
+        </p>
+      </div>
+
+      <div class="border border-rule bg-surface lg:col-span-5">
+        <div class="border-b border-rule px-6 pb-4 pt-5">
+          <div class="font-serif text-[19px] font-semibold">Who is behind this</div>
+        </div>
+        <dl class="px-6 pb-3 pt-1.5">
+          {
+            REGISTRATION.map((row) => (
+              <div class="flex justify-between gap-5 border-b border-rule2 py-3.5 last:border-b-0">
+                <dt class="shrink-0 text-sm text-muted">{row.k}</dt>
+                <dd class="num text-right text-[14.5px]">{row.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  {/* Four things that are true, including one against our own interest. */}
+  <section class="mx-auto grid max-w-[1440px] border-b border-rule md:grid-cols-2 lg:grid-cols-4">
+    {
+      FACTS.map((f, i) => (
+        <div
+          class:list={[
+            'px-5 py-7 md:px-8',
+            i < 3 && 'border-b border-rule lg:border-b-0 lg:border-r',
+            i === 1 && 'md:border-r',
+            i === 0 && 'lg:pl-20',
+            i === 3 && 'lg:pr-20',
+          ]}
+        >
+          <div class="mb-2 text-[15.5px] font-semibold">{f.t}</div>
+          <div class="text-sm leading-[1.68] text-muted">{f.d}</div>
+        </div>
+      ))
+    }
+  </section>
+
+  {/* Do you even need one — the section a site paid per account would not write. */}
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <div class="grid items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <h2 class="mb-4 font-serif text-[28px] font-bold leading-[1.2] tracking-tight md:text-[34px]">
+          Do you actually need a demat account?
+        </h2>
+        <p class="mb-4 text-base leading-[1.72] text-ink3 md:text-[16.5px]">
+          Often, no. If all you want is mutual funds, you can invest directly through the AMC or an
+          RTA platform without any broker at all — and pay no brokerage.
+        </p>
+        <p class="text-base leading-[1.72] text-ink3 md:text-[16.5px]">
+          You need one to hold shares, ETFs, bonds or sovereign gold bonds in your own name.
+        </p>
+      </div>
+      <div class="border border-rule bg-surface lg:col-span-7">
+        <div class="grid sm:grid-cols-2">
+          <div class="border-b border-rule px-7 py-6 sm:border-r">
+            <div class="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-green">
+              You probably need one
+            </div>
+            <p class="text-[14.5px] leading-[1.72] text-ink3">
+              To buy individual shares or ETFs &middot; to hold sovereign gold bonds &middot; to
+              apply for IPOs &middot; to hold securities in your own name
+            </p>
+          </div>
+          <div class="border-b border-rule px-7 py-6">
+            <div class="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-caveat">
+              You probably don&rsquo;t
+            </div>
+            <p class="text-[14.5px] leading-[1.72] text-ink3">
+              If you only want mutual funds &middot; if you are still building an emergency fund
+              &middot; if you have high-interest debt to clear first
+            </p>
+          </div>
+        </div>
+        <div class="bg-tint2 px-7 py-6">
+          <p class="text-[14.5px] leading-[1.72] text-ink3">
+            <strong class="text-ink">Compare at least two brokers before you choose.</strong> Charges,
+            platform quality and support differ, and we are not in a position to tell you{' '}
+            {PARTNER.displayName} is the best fit for you — we are paid by them.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Charges and KYC */}
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="border border-rule bg-surface">
+        <div class="border-b border-rule px-7 pb-4 pt-5">
+          <div class="font-serif text-[21px] font-semibold">What it costs</div>
+          <div class="mt-1.5 text-[13.5px] text-muted">
+            {PARTNER.displayName} sets and publishes these, not us. Check their charges page before
+            opening.
+          </div>
+        </div>
+        <dl class="px-7 pb-5 pt-1.5">
+          {
+            CHARGES.map((c) => (
+              <div class="flex justify-between gap-5 border-b border-rule2 py-3.5">
+                <dt class="text-[14.5px] text-ink3">{c.label}</dt>
+                <dd class="num text-right text-[14.5px]">
+                  {c.value ?? (
+                    <a href="https://aliceblueonline.com/" target="_blank" rel="noopener noreferrer">
+                      See their charges page &rarr;
+                    </a>
+                  )}
+                </dd>
+              </div>
+            ))
+          }
+          <div class="flex justify-between gap-5 py-3.5">
+            <dt class="text-[14.5px] text-ink3">Statutory charges</dt>
+            <dd class="text-right text-[14.5px] text-muted">STT, GST, stamp duty, SEBI fees</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="border border-rule bg-surface">
+        <div class="border-b border-rule px-7 pb-4 pt-5">
+          <div class="font-serif text-[21px] font-semibold">What you will need</div>
+          <div class="mt-1.5 text-[13.5px] text-muted">
+            KYC happens on {PARTNER.displayName}&rsquo;s site, not here. We never see your documents.
+          </div>
+        </div>
+        <ol class="flex flex-col gap-4 px-7 py-6">
+          {
+            KYC.map((k) => (
+              <li class="flex gap-3.5">
+                <span class="num shrink-0 font-serif text-[15px] font-bold text-green">{k.n}</span>
+                <span class="text-[14.5px] leading-[1.68] text-ink3">
+                  <strong class="text-ink">{k.title}</strong> — {k.detail}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <PartnerCta heading="If you have read the above and still want to go ahead">
+      This opens {PARTNER.displayName}&rsquo;s own eKYC with our partner code attached. Everything
+      from that point — your documents, your money, your account — is between you and{' '}
+      {PARTNER.displayName}.
+    </PartnerCta>
+  </section>
+
+  {/* Complaints routing. Stating it protects us as much as the reader. */}
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <div class="grid items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <h2 class="mb-3.5 font-serif text-[26px] font-bold leading-[1.22] tracking-tight md:text-[30px]">
+          If something goes wrong
+        </h2>
+        <p class="text-base leading-[1.72] text-ink3">
+          Complaints about your broking account do not come to us — we cannot access, move or close
+          it. They follow the regulated escalation path.
+        </p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-3 lg:col-span-7">
+        {
+          GRIEVANCE_PATH.map((s) => (
+            <div class="border border-rule bg-surface px-6 py-5">
+              <div class="num mb-2 text-xs text-faint">{s.step}</div>
+              <div class="mb-1.5 text-[15.5px] font-semibold">{s.name}</div>
+              <div class="text-[13.5px] leading-[1.65] text-muted">{s.detail}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  {/* Full statutory disclosure */}
+  <section class="border-t border-rule bg-tint px-5 py-11 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <div class="mb-4 text-xs uppercase tracking-[0.08em] text-muted">Full disclosure</div>
+      <div class="grid gap-11 lg:grid-cols-2">
+        <div class="text-[13.5px] leading-[1.78] text-ink3">
+          <p class="mb-3.5"><strong class="text-ink">Referral relationship.</strong> {referralDisclosure()}</p>
+          <p>
+            <strong class="text-ink">No advisory relationship.</strong> {SITE.name} is not a
+            SEBI-registered Investment Adviser or Research Analyst. Nothing published here is
+            personalised investment advice, a recommendation to buy or sell any security, or a
+            solicitation to trade. We do not offer portfolio management, stock tips or derivative
+            signals.
+          </p>
+        </div>
+        <div class="text-[13.5px] leading-[1.78] text-ink3">
+          <p class="mb-3.5"><strong class="text-ink">Market risk.</strong> {MARKET_RISK} Past performance does not indicate future returns. Brokerage will not exceed the SEBI prescribed limit.</p>
+          <p>
+            <strong class="text-ink">Charges.</strong> All account charges, brokerage and statutory
+            levies are set and collected by {PARTNER.displayName} and governed by their official
+            documents, not by us.{!chargesVerified && ' Charge figures on this page link to their published charges page rather than being restated here.'}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

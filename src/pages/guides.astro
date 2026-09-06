@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { dmyLong } from '../lib/format.js';
+import { LANGUAGES, DEFAULT_LANG, articleHref } from '../lib/languages.js';
+
+/* Replaces two overlapping pages: /learn, which advertised 42 lessons and 23
+ * modules that were never written, and /knowledge-hub, whose nine "articles"
+ * were teasers linking back to these same guides. Both 301 here. */
+const GUIDES = [
+  { topic: 'Investing', title: 'What a mutual fund actually does', href: '/mutual-funds',
+    blurb: 'Pooled investing, NAV, expense ratios and why fund categories behave differently — with an SIP calculator whose assumptions you can change.' },
+  { topic: 'Planning', title: 'The number you are actually aiming for', href: '/financial-freedom',
+    blurb: 'The Rule of 25, the 4% withdrawal rule, and an eight-stage ladder from paycheque-to-paycheque to independent.' },
+  { topic: 'Debt & behaviour', title: 'Ten money mistakes that quietly cost the most', href: '/money-mistakes',
+    blurb: 'The minimum-due trap, lifestyle inflation, chasing guaranteed returns and seven more — each with the habit that replaces it.' },
+  { topic: 'Foundations', title: 'A five-minute financial health check', href: '/financial-health',
+    blurb: 'Cash flow, emergency buffer, debt load, protection and investing discipline. Runs in your browser; nothing is stored or sent.' },
+  { topic: 'Tools', title: 'Calculators that show their working', href: '/calculators',
+    blurb: 'The assumed return and the expense ratio are sliders, not hidden constants, and every projection states what it ignores.' },
+  { topic: 'Markets', title: 'How we make money, and what a demat account is for', href: '/partner',
+    blurb: 'Our partner relationship in full, whether you actually need a demat account, and what the KYC steps involve.' },
+];
+
+/* Pipeline articles, newest first. Empty until the content pipeline lands, and
+ * the section simply does not render — no "coming soon" placeholder. */
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === DEFAULT_LANG))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const title = 'Every guide we have published';
+const description =
+  'Free, plain-language guides to mutual funds, financial freedom, credit and personal finance for Indian beginners. No account, nothing collected.';
+---
+
+<Base title={`${title} | The MoneyGoal`} description={description}>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <h1 class="mb-4 font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[46px]">
+        {title}
+      </h1>
+      <p class="max-w-[660px] text-[17px] leading-[1.7] text-ink3 md:text-[18px]">
+        Free to read, no account, nothing collected about you. Every guide states its assumptions
+        and says plainly what it is not.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <div class="grid gap-px border border-rule bg-rule md:grid-cols-2 lg:grid-cols-3">
+      {
+        GUIDES.map((g) => (
+          <a href={g.href} class="block bg-surface px-7 pb-8 pt-7">
+            <div class="mb-4 text-[11.5px] uppercase tracking-[0.08em] text-muted">{g.topic}</div>
+            <h2 class="mb-2.5 font-serif text-[22px] font-semibold leading-[1.3] text-ink">{g.title}</h2>
+            <p class="text-[14.5px] leading-[1.65] text-ink3">{g.blurb}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    posts.length > 0 && (
+      <section class="mx-auto max-w-[1440px] px-5 pb-16 md:px-10 lg:px-20">
+        <div class="mb-6 flex items-baseline justify-between border-b-[1.5px] border-ink pb-4">
+          <h2 class="font-serif text-[28px] font-bold tracking-tight">Latest explainers</h2>
+          <a href="/blog" class="text-[14.5px]">All {posts.length} &rarr;</a>
+        </div>
+        {posts.slice(0, 6).map((post) => (
+          <a href={articleHref(DEFAULT_LANG, post.slug)} class="block border-b border-rule py-6">
+            <div class="mb-2 flex flex-wrap items-center gap-3">
+              <span class="text-[11.5px] uppercase tracking-[0.08em] text-green">{post.data.category}</span>
+              <span class="text-[13px] text-faint">{dmyLong(post.data.pubDate)}</span>
+            </div>
+            <div class="mb-2 font-serif text-[24px] font-semibold leading-[1.3] text-ink">{post.data.title}</div>
+            <p class="max-w-[720px] text-[15.5px] leading-[1.68] text-ink3">{post.data.description}</p>
+          </a>
+        ))}
+      </section>
+    )
+  }
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-16 md:px-10 lg:px-20">
+    <div class="border-t border-rule pt-8">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Read in your language</div>
+      <div class="flex flex-wrap gap-2.5">
+        {
+          LANGUAGES.map((l) => (
+            <a
+              href={l.code === DEFAULT_LANG ? '/blog' : `/${l.code}/blog`}
+              lang={l.code}
+              class="border border-rule bg-surface px-4 py-2.5 text-[15px] transition-colors hover:border-ink"
+            >
+              {l.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,71 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { dmyLong } from '../../../lib/format.js';
+import { LANGUAGES, DEFAULT_LANG, PREFIXED_CODES, articleHref, langName, stripLangPrefix } from '../../../lib/languages.js';
+
+/* A listing exists for every non-default language even when it is empty, so the
+ * hreflang target and the language switcher always resolve to a real page
+ * rather than a 404. */
+export async function getStaticPaths() {
+  return PREFIXED_CODES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === lang))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const name = langName(lang);
+---
+
+<Base
+  title={`${name} — The MoneyGoal`}
+  description={`Plain-language financial explainers for Indian readers, in ${name}. Free, with sources and stated assumptions.`}
+  lang={lang}
+>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <h1 class="mb-4 font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[46px]" lang={lang}>
+        {name}
+      </h1>
+      <p class="max-w-[660px] text-[17px] leading-[1.7] text-ink3">
+        Explainers published in {name}. Every article states its sources and its assumptions.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-12 md:px-10 lg:px-20">
+    <div class="mb-9 flex flex-wrap items-center gap-2.5 border-b border-rule pb-7">
+      <span class="mr-1 text-xs uppercase tracking-[0.07em] text-muted">Language</span>
+      {
+        LANGUAGES.map((l) =>
+          l.code === lang ? (
+            <span class="bg-ink px-3.5 py-2 text-[14px] text-paper" lang={l.code}>{l.name}</span>
+          ) : (
+            <a href={l.code === DEFAULT_LANG ? '/blog' : `/${l.code}/blog`} lang={l.code} class="border border-rule bg-surface px-3.5 py-2 text-[14px] text-ink3 hover:border-ink">
+              {l.name}
+            </a>
+          ),
+        )
+      }
+    </div>
+
+    {
+      posts.length === 0 ? (
+        <p class="text-[16px] leading-[1.7] text-ink3">
+          Nothing published in {name} yet. The English guides are at <a href="/guides">/guides</a>.
+        </p>
+      ) : (
+        posts.map((post) => (
+          <a href={articleHref(lang, stripLangPrefix(post.slug))} class="block border-b border-rule py-7">
+            <div class="mb-2.5 flex flex-wrap items-center gap-3">
+              <span class="text-[11.5px] uppercase tracking-[0.08em] text-green">{post.data.category}</span>
+              <span class="text-[13px] text-faint">{dmyLong(post.data.pubDate)}</span>
+            </div>
+            <h2 class="mb-2 font-serif text-[25px] font-semibold leading-[1.3] text-ink" lang={lang}>{post.data.title}</h2>
+            <p class="max-w-[720px] text-[15.5px] leading-[1.68] text-ink3" lang={lang}>{post.data.description}</p>
+          </a>
+        ))
+      )
+    }
+  </section>
+</Base>

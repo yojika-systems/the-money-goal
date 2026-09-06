@@ -1,0 +1,266 @@
+---
+import Base from '../layouts/Base.astro';
+import PartnerCta from '../components/PartnerCta.astro';
+import Disclosure from '../components/Disclosure.astro';
+import { SITE, PARTNER } from '../lib/site.js';
+import { WHAT_THIS_IS, WHAT_IT_ISNT, credentialLine } from '../lib/disclosures.js';
+import { LANGUAGES } from '../lib/languages.js';
+
+const GUIDES = [
+  {
+    topic: 'Investing',
+    title: 'What a mutual fund actually does',
+    blurb:
+      'Pooled investing, NAV, expense ratios and why fund categories behave differently. With an SIP calculator you can change.',
+    href: '/mutual-funds',
+    cta: 'Read the guide',
+  },
+  {
+    topic: 'Planning',
+    title: 'The number you are actually aiming for',
+    blurb:
+      'The Rule of 25, the 4% withdrawal rule, and an eight-stage ladder from paycheque-to-paycheque to independent.',
+    href: '/financial-freedom',
+    cta: 'Read the guide',
+  },
+  {
+    topic: 'Debt',
+    title: 'Ten money mistakes that cost the most',
+    blurb:
+      'The minimum-due trap, mixing insurance with investment, and eight more — each with the habit that replaces it.',
+    href: '/money-mistakes',
+    cta: 'Read the guide',
+  },
+  {
+    topic: 'Foundations',
+    title: 'A five-minute financial health check',
+    blurb:
+      'Cash flow, emergency buffer, debt load, protection and investing discipline. Runs in your browser; nothing is sent anywhere.',
+    href: '/financial-health',
+    cta: 'Take the check',
+  },
+  {
+    topic: 'Markets',
+    title: 'Demat and trading accounts explained',
+    blurb:
+      'What each account holds, the charges worth reading before you sign, and what the KYC steps actually involve.',
+    href: '/partner',
+    cta: 'Read the guide',
+  },
+];
+
+const PROMISES = [
+  { title: 'No tips, ever', detail: 'No stock recommendations, no target prices.' },
+  { title: 'No account needed', detail: 'Nothing to sign up for. No data collected.' },
+  { title: 'Assumptions shown', detail: 'Every projection states what it assumed.' },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE.url}/#organization`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE.url}/#website`,
+      url: SITE.url,
+      name: SITE.name,
+      inLanguage: 'en-IN',
+      publisher: { '@id': `${SITE.url}/#organization` },
+    },
+  ],
+};
+---
+
+<Base
+  title="The MoneyGoal — Learn how money works, in plain language"
+  description={SITE.description}
+  jsonLd={jsonLd}
+>
+  {/* Hero */}
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20 lg:py-[84px]">
+    <div class="mx-auto grid max-w-[1440px] items-start gap-8 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">{SITE.tagline}</div>
+        <h1 class="mb-6 font-serif text-[40px] font-bold leading-[1.12] tracking-tight md:text-[52px] lg:text-[62px]">
+          Learn how money works before someone sells you something.
+        </h1>
+        <p class="mb-8 max-w-[560px] text-[17px] leading-[1.65] text-ink3 md:text-[19px]">
+          Plain-language guides to mutual funds, markets, credit and personal finance — written for
+          people with no finance background. Every number shows the assumption behind it.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            href="/guides"
+            class="bg-green px-7 py-4 text-base font-medium text-paper transition-opacity hover:opacity-90"
+            >Start with the basics</a
+          >
+          <a href="/blog" class="border-b-[1.5px] border-ink pb-0.5 text-base font-medium text-ink"
+            >Browse all guides</a
+          >
+        </div>
+      </div>
+
+      {/* Credentials in place of social proof. The site is new and has no users;
+          the previous version invented 42,000 of them. */}
+      <div class="border border-rule bg-surface lg:col-span-5">
+        <div class="border-b border-rule px-6 pb-4 pt-5">
+          <div class="font-serif text-[19px] font-semibold">Before you read anything here</div>
+        </div>
+        <div class="grid sm:grid-cols-2">
+          <div class="border-b border-rule px-6 py-5 sm:border-b-0 sm:border-r">
+            <div class="mb-3 flex items-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0B5C3F" stroke-width="2.4" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
+              <span class="text-xs font-semibold uppercase tracking-[0.07em] text-green">What this is</span>
+            </div>
+            <ul class="flex flex-col gap-3 text-[14.5px] leading-[1.62] text-ink3">
+              {WHAT_THIS_IS.map((line) => <li>{line}</li>)}
+            </ul>
+          </div>
+          <div class="px-6 py-5">
+            <div class="mb-3 flex items-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8442A" stroke-width="2.4" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+              <span class="text-xs font-semibold uppercase tracking-[0.07em] text-caveat">What it isn&rsquo;t</span>
+            </div>
+            <ul class="flex flex-col gap-3 text-[14.5px] leading-[1.62] text-ink3">
+              {WHAT_IT_ISNT.map((line) => <li>{line}</li>)}
+            </ul>
+          </div>
+        </div>
+        <div class="border-t border-rule bg-tint px-6 py-4 text-[13px] leading-[1.6] text-ink3">
+          {credentialLine()}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Three promises */}
+  <section class="mx-auto grid max-w-[1440px] border-b border-rule md:grid-cols-3">
+    {
+      PROMISES.map((p, i) => (
+        <div
+          class:list={[
+            'flex items-start gap-3.5 px-5 py-7 md:px-8 lg:py-[30px]',
+            i < 2 && 'border-b border-rule md:border-b-0 md:border-r',
+            i === 0 && 'lg:pl-20',
+            i === 2 && 'lg:pr-20',
+          ]}
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B5C3F" stroke-width="1.8" class="mt-0.5 shrink-0" aria-hidden="true">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          <div>
+            <div class="mb-1 text-[15.5px] font-semibold">{p.title}</div>
+            <div class="text-sm leading-[1.6] text-muted">{p.detail}</div>
+          </div>
+        </div>
+      ))
+    }
+  </section>
+
+  {/* Guides */}
+  <section class="mx-auto max-w-[1440px] px-5 pt-14 md:px-10 lg:px-20 lg:pt-[76px]">
+    <div class="mb-9 flex items-baseline justify-between gap-6">
+      <h2 class="font-serif text-[28px] font-bold tracking-tight md:text-[36px]">Start here</h2>
+      <a href="/guides" class="shrink-0 text-[14.5px]">All guides &rarr;</a>
+    </div>
+
+    <div class="grid gap-px border border-rule bg-rule md:grid-cols-2 lg:grid-cols-3">
+      {
+        GUIDES.map((g) => (
+          <article class="flex flex-col bg-surface px-7 pb-8 pt-[30px]">
+            <div class="mb-4 text-[11.5px] uppercase tracking-[0.08em] text-muted">{g.topic}</div>
+            <h3 class="mb-2.5 font-serif text-[22px] font-semibold leading-[1.3]">{g.title}</h3>
+            <p class="mb-4.5 flex-1 text-[14.5px] leading-[1.65] text-ink3">{g.blurb}</p>
+            <a href={g.href} class="mt-4 text-sm font-medium">
+              {g.cta} &rarr;
+            </a>
+          </article>
+        ))
+      }
+      <article class="flex flex-col justify-between bg-tint px-7 pb-8 pt-[30px]">
+        <div>
+          <div class="mb-4 text-[11.5px] uppercase tracking-[0.08em] text-muted">Published daily</div>
+          <h3 class="mb-2.5 font-serif text-[22px] font-semibold leading-[1.3]">
+            New explainers, twelve languages
+          </h3>
+          <p class="mb-4.5 text-[14.5px] leading-[1.65] text-ink3">
+            One new guide every day, published in Hindi, Tamil, Telugu, Bengali, Marathi and seven
+            more.
+          </p>
+        </div>
+        <a href="/blog" class="mt-4 text-sm font-medium">See the archive &rarr;</a>
+      </article>
+    </div>
+  </section>
+
+  {/* Calculator teaser */}
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20 lg:py-[72px]">
+    <div class="grid border border-rule bg-surface lg:grid-cols-2">
+      <div class="border-b border-rule px-7 py-10 md:px-11 lg:border-b-0 lg:border-r">
+        <h2 class="mb-3.5 font-serif text-[26px] font-bold leading-[1.2] tracking-tight md:text-[32px]">
+          Calculators that argue with themselves
+        </h2>
+        <p class="mb-6 text-base leading-[1.65] text-ink3">
+          Most SIP calculators hide the return they assumed. Ours put it next to the answer, so you
+          can change it and watch the number move.
+        </p>
+        <a href="/calculators" class="border-b-[1.5px] border-ink pb-0.5 text-[15.5px] font-medium text-ink"
+          >Open the SIP calculator</a
+        >
+      </div>
+      <div class="bg-tint2 px-7 py-9 md:px-11">
+        <div class="flex items-baseline justify-between border-b border-rule pb-4">
+          <span class="text-sm text-muted">Monthly investment</span>
+          <span class="num text-xl font-semibold">&#8377;15,000</span>
+        </div>
+        <div class="flex items-baseline justify-between border-b border-rule py-4">
+          <span class="text-sm text-muted">For</span>
+          <span class="num text-xl font-semibold">15 years</span>
+        </div>
+        <div class="flex items-baseline justify-between pb-[18px] pt-4">
+          <span class="text-sm text-muted">Could become</span>
+          <span class="num font-serif text-[30px] font-bold text-green">&#8377;75.7 L</span>
+        </div>
+        <Disclosure>
+          12% p.a. nominal return, uninterrupted monthly investing, starting from zero. Not a
+          forecast. Real returns vary and can be negative.
+        </Disclosure>
+      </div>
+    </div>
+  </section>
+
+  {/* Partner */}
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20 lg:pb-[76px]">
+    <PartnerCta heading="When you are ready to open a demat account">
+      We are an authorised person of {PARTNER.displayName} and are paid {PARTNER.compensation} when an
+      account is opened through our link. It does not change what you pay, and it does not decide
+      what we write.
+    </PartnerCta>
+  </section>
+
+  {/* Languages */}
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20 lg:pb-[76px]">
+    <div class="border-t border-rule pt-8">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Read in your language</div>
+      <div class="flex flex-wrap gap-2.5">
+        {
+          LANGUAGES.map((l) => (
+            <a
+              href={l.code === 'en' ? '/blog' : `/${l.code}/blog`}
+              class="border border-rule bg-surface px-4 py-2.5 text-[15px] transition-colors hover:border-ink"
+              lang={l.code}
+            >
+              {l.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

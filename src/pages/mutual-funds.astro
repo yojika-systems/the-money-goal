@@ -1,0 +1,147 @@
+---
+import Base from '../layouts/Base.astro';
+import SipCalculator from '../components/widgets/SipCalculator.astro';
+
+const title = 'What a mutual fund actually does';
+const description =
+  'Pooled investing, NAV, expense ratios, and why fund categories behave differently. A beginner-first guide with an SIP calculator whose assumptions you can change.';
+
+/* Copy carried over from the pre-Astro mutual-funds.html, with three claims
+ * corrected because they failed the standard this site now states on every page:
+ *  · named holdings ("TCS, Reliance, HDFC Bank, Infosys") genericised — naming
+ *    securities on a page that discloses a broker relationship reads as a call;
+ *  · "virtually zero probability of negative return" removed — an unsourced
+ *    absolute about future returns is exactly what the disclaimers disclaim;
+ *  · return and inflation figures reframed as stated assumptions, not facts. */
+const POOLING = [
+  { title: 'Many investors', body: 'Everyday individuals pool varying amounts — from as little as ₹500 a month — into a common trust.' },
+  { title: 'A fund manager', body: 'SEBI-registered portfolio specialists do the balance-sheet analysis and company research full-time.' },
+  { title: 'Spread across holdings', body: "Capital is diversified across dozens of India's largest listed companies, spanning technology, energy, banking and consumer goods." },
+  { title: 'Proportionate NAV', body: 'As the underlying companies grow and pay dividends, the Net Asset Value rises, and your folio moves with it.' },
+];
+
+const TYPES = [
+  { name: 'Large, mid & flexi cap', horizon: '5+ years', body: 'Invests at least 65% in listed company stocks. Flexi cap funds allocate dynamically across the top 500 businesses.' },
+  { name: 'Liquid & short duration', horizon: 'Under 3 years', body: 'Lends to government treasury bills and corporate paper. No stock-market volatility; suited to emergency funds and parked cash.' },
+  { name: 'Balanced advantage', horizon: '3–5 years', body: 'Rebalances between equity and debt automatically. Trims equity when markets rise, adds when they fall.' },
+  { name: 'Nifty 50 & Sensex trackers', horizon: '7+ years', body: "Mirrors the index mechanically with no manager discretion, at expense ratios often between 0.10% and 0.20%." },
+  { name: 'ELSS (tax saving)', horizon: '3-year lock-in', body: 'Deduction up to ₹1.5 lakh under Section 80C, with the shortest lock-in of the 80C options — PPF runs 15 years, tax-saving FDs 5.' },
+];
+
+const ROADMAP = [
+  { n: 1, title: 'Define the horizon', body: 'When will you need this money? Under 3 years belongs in debt or liquid funds; over 5 years can carry equity.' },
+  { n: 2, title: 'Pick one fund class', body: 'A beginner needs one index fund or one well-regarded flexi cap. Owning a dozen overlapping funds is not diversification.' },
+  { n: 3, title: 'Automate the SIP', body: 'Schedule the auto-debit a day or two after salary lands. It removes the monthly decision, which is the part that fails.' },
+  { n: 4, title: 'Check direct plan and TER', body: 'Direct plans carry no distributor commission. The gap between direct and regular is what distribution costs you.' },
+  { n: 5, title: 'Stay put through dips', body: 'A falling NAV means the same instalment buys more units. Selling at the bottom is what turns volatility into loss.' },
+];
+---
+
+<Base title={`${title} | The MoneyGoal`} description={description}>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Investing</div>
+      <h1 class="mb-6 max-w-[900px] font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
+        What a mutual fund actually does
+      </h1>
+      <p class="max-w-[640px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+        Instead of buying shares yourself with a large amount of capital, your savings are pooled
+        with thousands of other people&rsquo;s under institutional custody, and a professional
+        allocates the whole pot. That is the entire idea. Everything else is detail.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <h2 class="mb-8 font-serif text-[28px] font-bold tracking-tight md:text-[34px]">How the pooling works</h2>
+    <ol class="grid gap-px border border-rule bg-rule md:grid-cols-2 lg:grid-cols-4">
+      {
+        POOLING.map((p, i) => (
+          <li class="bg-surface px-7 pb-7 pt-6">
+            <div class="num mb-3 font-serif text-[15px] font-bold text-green">0{i + 1}</div>
+            <h3 class="mb-2 font-serif text-[19px] font-semibold leading-[1.3]">{p.title}</h3>
+            <p class="text-[14.5px] leading-[1.7] text-ink3">{p.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <div class="mb-8 max-w-[640px]">
+      <h2 class="mb-3 font-serif text-[28px] font-bold tracking-tight md:text-[34px]">
+        Match the fund to when you need the money
+      </h2>
+      <p class="text-[16px] leading-[1.72] text-ink3">
+        This is the decision that matters most, and the one most often skipped. Never put money you
+        need soon into a fund that can fall while you wait.
+      </p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px] border-collapse text-left">
+        <thead>
+          <tr class="border-b-[1.5px] border-ink">
+            <th class="py-3.5 pr-6 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-muted">Fund type</th>
+            <th class="py-3.5 pr-6 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-muted">Suits a horizon of</th>
+            <th class="py-3.5 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-muted">What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            TYPES.map((t) => (
+              <tr class="border-b border-rule align-top">
+                <td class="py-4 pr-6 text-[15.5px] font-semibold">{t.name}</td>
+                <td class="num py-4 pr-6 text-[15px] text-ink3">{t.horizon}</td>
+                <td class="py-4 text-[14.5px] leading-[1.7] text-ink3">{t.body}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-5 border-t border-dashed border-[#D8D1C3] pt-3.5 text-[13.5px] leading-[1.68] text-ink3">
+      <span class="font-semibold text-caveat">Note.</span> Horizons are conventional rules of thumb,
+      not rules. Longer holding periods have historically reduced the chance of a loss in equity
+      funds, but they do not remove it — no holding period guarantees a positive return.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <div class="mb-8 max-w-[640px]">
+      <h2 class="mb-3 font-serif text-[28px] font-bold tracking-tight md:text-[34px]">
+        See what the assumptions actually do
+      </h2>
+      <p class="text-[16px] leading-[1.72] text-ink3">
+        An SIP is a method, not a product: you buy a fund a little at a time. Move the return and the
+        expense ratio below and watch how much of the outcome they decide.
+      </p>
+    </div>
+    <SipCalculator />
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    <h2 class="mb-8 font-serif text-[28px] font-bold tracking-tight md:text-[34px]">
+      A five-step start
+    </h2>
+    <ol class="grid gap-px border border-rule bg-rule md:grid-cols-2 lg:grid-cols-5">
+      {
+        ROADMAP.map((r) => (
+          <li class="bg-surface px-6 pb-7 pt-6">
+            <div class="num mb-3 font-serif text-[15px] font-bold text-green">0{r.n}</div>
+            <h3 class="mb-2 font-serif text-[18px] font-semibold leading-[1.3]">{r.title}</h3>
+            <p class="text-[14px] leading-[1.7] text-ink3">{r.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-9 border-l-[3px] border-caveat bg-caveat-bg px-6 py-5">
+      <p class="text-[14.5px] leading-[1.7] text-ink3">
+        <strong class="text-ink">Mutual fund investments are subject to market risks. Read all
+        scheme-related documents carefully before investing.</strong> Past performance is not an
+        indicator of future returns. The MoneyGoal is an educational site and does not sell mutual
+        funds, distribute them, or receive any commission on them.
+      </p>
+    </div>
+  </section>
+</Base>

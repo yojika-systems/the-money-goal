@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Page not found — The MoneyGoal"
+  description="This page could not be found. Browse The MoneyGoal's financial education guides instead."
+  noindex
+>
+  <section class="mx-auto max-w-[1440px] px-5 py-20 md:px-10 lg:px-20">
+    <div class="measure">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Error 404</div>
+      <h1 class="mb-6 font-serif text-[40px] font-bold leading-[1.12] tracking-tight lg:text-[52px]">
+        This page doesn&rsquo;t exist.
+      </h1>
+      <p class="mb-8 text-[19px] leading-[1.65] text-ink3">
+        The link may be outdated, or the address may have a typo. Everything on The MoneyGoal is
+        free to read and reachable from the guides.
+      </p>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="bg-green px-7 py-4 text-base font-medium text-paper">Go to the homepage</a>
+        <a href="/guides" class="border-b-[1.5px] border-ink pb-0.5 text-base font-medium">Browse all guides</a>
+      </div>
+    </div>
+  </section>
+</Base>

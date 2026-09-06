@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import HealthCheck from '../components/widgets/HealthCheck.astro';
+
+const title = 'Financial health check — a five-minute self-assessment';
+const description =
+  'A private five-minute check of your cash flow, emergency buffer, debt, protection and investing habits. Runs entirely in your browser; nothing is stored or sent.';
+---
+
+<Base title={title} description={description}>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto grid max-w-[1440px] items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">
+          Five-minute self-check
+        </div>
+        <h1 class="mb-6 font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
+          Understand your financial health.
+        </h1>
+        <p class="max-w-[600px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+          Review the five foundations of financial wellbeing: cash flow, resilience, debt,
+          protection and investing discipline. No account, phone number or financial values are
+          required.
+        </p>
+      </div>
+      <div class="border border-rule bg-surface px-7 py-6 lg:col-span-5">
+        <div class="mb-3 text-xs font-semibold uppercase tracking-[0.07em] text-green">
+          Private by construction
+        </div>
+        <p class="text-[14.5px] leading-[1.72] text-ink3">
+          This assessment runs entirely in your browser. Your answers are never transmitted, never
+          stored, and never seen by us — there is no account here to attach them to.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <div class="grid items-start gap-11 lg:grid-cols-12">
+      <div class="lg:col-span-7"><HealthCheck /></div>
+      <div class="lg:col-span-5">
+        <h2 class="mb-4 font-serif text-[26px] font-bold leading-[1.22] tracking-tight">
+          What this checks, and what it can&rsquo;t
+        </h2>
+        <p class="mb-4 text-[15.5px] leading-[1.72] text-ink3">
+          Seven statements covering the things that matter most in roughly the order they matter:
+          spending less than you earn, knowing where it went, a buffer for shocks, clearing
+          expensive debt, protection, consistent investing, and keeping your records current.
+        </p>
+        <p class="text-[15.5px] leading-[1.72] text-ink3">
+          It is a prompt, not a diagnosis. It knows nothing about your income, your dependants or
+          your job security, and a score here is not advice about what to do next.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

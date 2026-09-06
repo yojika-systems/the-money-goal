@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import { MISTAKES } from '../lib/mistakes.js';
+
+const title = 'Ten money mistakes that quietly cost the most';
+const description =
+  'The minimum-due trap, lifestyle inflation, chasing guaranteed returns and seven more — each with why it happens and the habit that replaces it.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: title,
+  itemListElement: MISTAKES.map((m, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: m.title,
+  })),
+};
+---
+
+<Base title={`${title} — The MoneyGoal`} description={description} jsonLd={jsonLd}>
+  <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
+    <div class="mx-auto max-w-[1440px]">
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Debt &amp; behaviour</div>
+      <h1 class="mb-6 max-w-[900px] font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
+        Ten money mistakes that quietly cost the most
+      </h1>
+      <p class="max-w-[640px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
+        None of these are unusual and none of them are stupid. Each one is a reasonable-looking
+        decision with a cost that only shows up later. For each, what happens, why it happens, and
+        the habit that replaces it.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[1440px] px-5 py-14 md:px-10 lg:px-20">
+    <ol class="grid gap-px border border-rule bg-rule md:grid-cols-2">
+      {
+        MISTAKES.map((m, i) => (
+          <li class="bg-surface px-7 pb-8 pt-7">
+            <div class="mb-4 flex items-baseline gap-3">
+              <span class="num font-serif text-[15px] font-bold text-green">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h2 class="font-serif text-[22px] font-semibold leading-[1.3]">{m.title}</h2>
+            </div>
+            <dl class="flex flex-col gap-3.5">
+              <div>
+                <dt class="mb-1 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-caveat">
+                  What happens
+                </dt>
+                <dd class="text-[14.5px] leading-[1.7] text-ink3">{m.problem}</dd>
+              </div>
+              <div>
+                <dt class="mb-1 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-muted">
+                  Why it happens
+                </dt>
+                <dd class="text-[14.5px] leading-[1.7] text-ink3">{m.why}</dd>
+              </div>
+              <div>
+                <dt class="mb-1 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-green">
+                  Better habit
+                </dt>
+                <dd class="text-[14.5px] leading-[1.7] text-ink3">{m.habit}</dd>
+              </div>
+            </dl>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-9 border-l-[3px] border-caveat bg-caveat-bg px-6 py-5">
+      <p class="text-[14.5px] leading-[1.7] text-ink3">
+        <strong class="text-ink">Educational information only.</strong> These examples are simplified
+        and do not constitute investment, tax, legal or credit advice. What is right for you depends
+        on circumstances this page knows nothing about.
+      </p>
+    </div>
+  </section>
+</Base>

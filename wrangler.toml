@@ -1,0 +1,15 @@
+# Cloudflare Pages configuration.
+#
+# Before this file existed, Pages served the REPOSITORY ROOT: /package.json,
+# /server.mjs and /scripts/*.ps1 were all publicly downloadable, and the
+# committed dist/ directory was published as a complete duplicate of the site.
+# pages_build_output_dir points Pages at Astro's build output instead, so only
+# built pages and public/ assets are served.
+#
+# This overrides the dashboard's "Build output directory" setting, which makes
+# the root -> dist switch atomic with the code rather than a separate manual
+# step. The BUILD COMMAND is not carried by wrangler.toml and must be set in
+# the dashboard: npm run build
+name = "the-money-goal"
+compatibility_date = "2026-09-06"
+pages_build_output_dir = "dist"

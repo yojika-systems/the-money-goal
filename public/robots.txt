@@ -1,0 +1,15 @@
+# themoneygoal.com
+#
+# Search engines and AI answer engines are both welcome to crawl and cite this
+# site. We do not permit our content to be used as model training data.
+#
+# Cloudflare's managed robots.txt (AI Crawl Control) previously overrode this
+# file at the edge with Disallow: / for GPTBot, ClaudeBot, Google-Extended and
+# six others. That block was turned off on 2026-09-06; if AI crawlers ever
+# disappear from the logs again, check that setting before this file.
+
+User-agent: *
+Content-Signal: search=yes, ai-train=no, use=reference
+Allow: /
+
+Sitemap: https://themoneygoal.com/sitemap-index.xml

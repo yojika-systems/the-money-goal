@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Line-height and tracking are set generously and never negative on body
+   * copy, because the same shell has to set Devanagari, Tamil, Telugu, Bengali,
+   * Kannada, Malayalam, Gurmukhi, Odia and Assamese. Indic scripts have taller
+   * glyphs with ascenders and descenders that collide at the tight leading a
+   * Latin-only design can get away with. */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+  :where(h1, h2, h3) {
+    text-wrap: pretty;
+  }
+  /* Visible focus for keyboard users — the old site had none. */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid theme('colors.green');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .measure {
+    @apply max-w-measure;
+  }
+  /* Tabular figures wherever numbers are compared down a column. */
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
