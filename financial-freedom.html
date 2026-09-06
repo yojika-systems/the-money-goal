@@ -89,17 +89,17 @@
 <span class="font-label-sm text-label-sm text-secondary font-semibold mt-space-2xs">6.0 Mos (Secured)</span>
 </div>
 <div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Freedom Score</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Savings rate</span>
 <div class="flex items-baseline gap-1 mt-space-2xs">
-<span class="font-metric-num text-metric-num text-on-surface" id="stat-score">68</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">/100</span>
+<span class="font-metric-num text-metric-num text-on-surface" id="stat-score">31</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">%</span>
 </div>
-<span class="font-label-sm text-label-sm text-secondary font-semibold mt-space-2xs">L4: Fully Secured</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold mt-space-2xs">of monthly income invested</span>
 </div>
 <div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between">
 <span class="font-label-sm text-label-sm text-on-surface-variant">Target Corpus</span>
-<span class="font-metric-num text-metric-num text-secondary mt-space-2xs" id="stat-corpus">₹1.05 Cr</span>
-<span class="font-label-sm text-label-sm text-on-surface font-semibold mt-space-2xs" id="stat-years">Est. in 14.8 yrs</span>
+<span class="font-metric-num text-metric-num text-secondary mt-space-2xs" id="stat-corpus">₹0.90 Cr</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold mt-space-2xs" id="stat-years">About 14.3 yrs</span>
 </div>
 </div>
 <!-- INTERACTIVE SLIDER & DYNAMIC ACCELERATOR CARD -->
@@ -130,15 +130,18 @@
 <span class="font-title-md text-title-md font-semibold text-on-surface">Acceleration Leverage</span>
 </div>
 <p class="font-body-md text-body-md text-on-surface leading-relaxed" id="slider-impact-text">
-              Cutting <strong class="text-secondary font-bold">₹5,000/mo</strong> of avoidable luxury accelerates your freedom date by <strong class="text-secondary font-bold">3.2 years</strong> and trims target corpus by <strong class="text-on-surface font-bold">₹15.0 Lakhs</strong>.
+              Redirecting <strong class="text-secondary font-bold">₹5,000/mo</strong> from spending into investing reaches the target about <strong class="text-secondary font-bold">3.1 years</strong> sooner, because it both raises the amount invested and lowers the target to <strong class="text-on-surface font-bold">₹0.90 Cr</strong>.
             </p>
 <div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden mt-space-2xs">
 <div class="h-full bg-secondary transition-all duration-300" id="sim-progress-bar" style="width: 68%;"></div>
 </div>
 <div class="flex justify-between items-center pt-space-2xs">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Revised Independence Age:</span>
-<span class="font-title-md text-title-md text-on-surface font-bold" id="target-age-display">42.8 Years (Baseline: 46.0)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Age when the target is reached:</span>
+<span class="font-title-md text-title-md text-on-surface font-bold" id="target-age-display">45.5 (baseline 48.6)</span>
 </div>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed pt-space-xs">
+              Illustration, not a forecast or personal advice. One hypothetical household earning ₹65,000 a month, starting from zero, investing every month without interruption at an assumed 12% p.a. nominal return, targeting 25× annual expenses (the 4% withdrawal rule). Real returns vary year to year, can be negative, and are not guaranteed. Inflation and tax are not modelled.
+            </p>
 </div>
 </div>
 </div>
@@ -492,48 +495,58 @@
 
       if (!slider) return;
 
+      // Illustration inputs. These describe one hypothetical household; they are
+      // not a forecast and not personalised to any reader.
+      const ANNUAL_RETURN = 0.12;          // nominal, pre-tax, long-term equity assumption
+      const WITHDRAWAL_RULE = 25;          // Rule of 25 (the 4% withdrawal rule)
       const baseMonthlyIncome = 65000;
       const baseMonthlyExpense = 35000;
       const baseSip = 15000;
       const currentAge = 31.2;
+      const i = ANNUAL_RETURN / 12;        // monthly rate
 
-      slider.addEventListener('input', function(e) {
-        const cut = parseInt(e.target.value, 10);
+      // Years of level monthly investing needed to reach a target, starting from
+      // zero. Solves the ordinary-annuity future value FV = PMT * ((1+i)^n - 1)/i
+      // for n:   n = ln(1 + FV*i/PMT) / ln(1+i)
+      function yearsToTarget(monthlyInvestment, target) {
+        if (monthlyInvestment <= 0 || target <= 0) return 0;
+        return Math.log(1 + (target * i) / monthlyInvestment) / Math.log(1 + i) / 12;
+      }
+
+      const baselineYears = yearsToTarget(baseSip, baseMonthlyExpense * 12 * WITHDRAWAL_RULE);
+
+      function render(cut) {
         const adjustedExpense = baseMonthlyExpense - cut;
         const adjustedSip = baseSip + cut;
-        const annualExpense = adjustedExpense * 12;
-        const targetCorpusNumber = annualExpense * 25; // 25x Rule
-        
-        // Corpus in Crores / Lakhs
-        const corpusInCr = (targetCorpusNumber / 10000000).toFixed(2);
-        
-        // Approximate compounding year calculation (12% annual return assumption)
-        // Simplified empirical financial acceleration curve
-        const baseYears = 18.0; 
-        const savingsRatio = adjustedSip / baseMonthlyIncome;
-        const yearsRemaining = Math.max(7.2, (baseYears * (0.231 / Math.max(0.1, savingsRatio))).toFixed(1));
-        const yearsSaved = (18.0 - parseFloat(yearsRemaining)).toFixed(1);
-        const projectedAge = (currentAge + parseFloat(yearsRemaining)).toFixed(1);
-        const corpusReductionLakhs = ((cut * 12 * 25) / 100000).toFixed(1);
+        const targetCorpus = adjustedExpense * 12 * WITHDRAWAL_RULE;
+        const years = yearsToTarget(adjustedSip, targetCorpus);
+        const yearsSaved = baselineYears - years;
+        const savingsRate = Math.round((adjustedSip / baseMonthlyIncome) * 100);
+        const corpusCr = (targetCorpus / 10000000).toFixed(2);
 
-        badge.textContent = '₹' + cut.toLocaleString('en-IN') + ' / mo';
-        statExpenses.textContent = '₹' + adjustedExpense.toLocaleString('en-IN');
-        statSip.textContent = '₹' + adjustedSip.toLocaleString('en-IN');
-        statCorpus.textContent = '₹' + corpusInCr + ' Cr';
-        statYears.textContent = 'Est. in ' + yearsRemaining + ' yrs';
-        targetAge.textContent = projectedAge + ' Years (Baseline: 46.0)';
+        badge.textContent = '\u20b9' + cut.toLocaleString('en-IN') + ' / mo';
+        statExpenses.textContent = '\u20b9' + adjustedExpense.toLocaleString('en-IN');
+        statSip.textContent = '\u20b9' + adjustedSip.toLocaleString('en-IN');
+        statCorpus.textContent = '\u20b9' + corpusCr + ' Cr';
+        statYears.textContent = 'About ' + years.toFixed(1) + ' yrs';
+        targetAge.textContent = (currentAge + years).toFixed(1) + ' (baseline ' + (currentAge + baselineYears).toFixed(1) + ')';
 
-        // Freedom score calculation
-        const score = Math.min(96, Math.round(55 + (savingsRatio * 60)));
-        if (statScore) statScore.textContent = score;
-        if (progressBar) progressBar.style.width = score + '%';
+        if (statScore) statScore.textContent = savingsRate;
+        if (progressBar) progressBar.style.width = Math.min(100, savingsRate) + '%';
 
         if (cut === 0) {
-          impactText.innerHTML = 'Showing baseline financial trajectory without expense reallocation. Accelerating SIP enhances the velocity toward Milestone 7.';
+          impactText.innerHTML = 'This is the baseline: investing <strong class="text-secondary font-bold">\u20b9' + baseSip.toLocaleString('en-IN') + '/mo</strong> toward a <strong class="text-on-surface font-bold">\u20b9' + corpusCr + ' Cr</strong> target. Move the slider to redirect spending into investing.';
         } else {
-          impactText.innerHTML = 'Cutting <strong class="text-secondary font-bold">₹' + cut.toLocaleString('en-IN') + '/mo</strong> of avoidable luxury accelerates your freedom date by <strong class="text-secondary font-bold">' + yearsSaved + ' years</strong> and trims target corpus by <strong class="text-on-surface font-bold">₹' + corpusReductionLakhs + ' Lakhs</strong>.';
+          impactText.innerHTML = 'Redirecting <strong class="text-secondary font-bold">\u20b9' + cut.toLocaleString('en-IN') + '/mo</strong> from spending into investing reaches the target about <strong class="text-secondary font-bold">' + yearsSaved.toFixed(1) + ' years</strong> sooner, because it both raises the amount invested and lowers the target to <strong class="text-on-surface font-bold">\u20b9' + corpusCr + ' Cr</strong>.';
         }
+      }
+
+      slider.addEventListener('input', function (e) {
+        render(parseInt(e.target.value, 10));
       });
+      // Render once on load so the page never shows figures that disagree with
+      // the slider's actual position.
+      render(parseInt(slider.value, 10));
     })();
   </script>
 </div></main><footer class="w-full bg-surface-container-lowest shadow-[0_-1px_6px_rgba(0,0,0,0.03)] pt-space-2xl pb-space-lg"><div class="max-w-[75rem] mx-auto px-gutter-mobile lg:px-gutter-desktop"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl pb-space-2xl"><div class="lg:col-span-1 flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><span class="moneygoal-brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36" role="img"><path class="moneygoal-brand-axis" d="M9 9v18h18"/><path class="moneygoal-brand-bars" d="M13 23v-5m5 5V12m5 11v-8"/><path class="moneygoal-brand-line" d="m11 21 6-5 4 3 7-8"/><path class="moneygoal-brand-arrow" d="M24 11h4v4"/></svg></span><span class="font-title-lg text-title-lg font-bold text-on-surface tracking-tight">The Money<span class="text-secondary">Goal</span></span></div><p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Financial education made simple, practical, and accessible to everyone. Helping you build financial confidence.</p></div><div class="flex flex-col gap-space-xs"><h4 class="font-title-md text-title-md text-on-surface font-semibold mb-space-2xs">Learn</h4><ul class="flex flex-col gap-space-2xs"><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Money Basics</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Mutual Funds</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Stocks &amp; ETFs</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Trading Basics</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Loans &amp; EMI</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Debt Management</li></ul></div><div class="flex flex-col gap-space-xs"><h4 class="font-title-md text-title-md text-on-surface font-semibold mb-space-2xs">Partner &amp; Growth</h4><ul class="flex flex-col gap-space-2xs"><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Alice Blue Demat</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Investment Account</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Referral Disclosure</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Partner Benefits</li></ul></div><div class="flex flex-col gap-space-xs"><h4 class="font-title-md text-title-md text-on-surface font-semibold mb-space-2xs">Company &amp; Legal</h4><ul class="flex flex-col gap-space-2xs"><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">About Us</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">FAQ</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Contact</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Privacy Policy</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Terms of Service</li><li class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer">Educational Disclaimer</li></ul></div></div><div class="p-space-md rounded-xl bg-surface-container-low mb-space-lg"><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px] mt-0.5 shrink-0">info</span><p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed"><span class="font-semibold text-on-surface">Disclaimer:</span> The MoneyGoal is an educational platform designed solely for financial awareness. Content, learning tools, and assessments do not constitute personalized investment advice or SEBI-registered portfolio recommendations. Investments in securities are subject to market risks.</p></div></div><div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm pt-space-md text-on-surface-variant"><p class="font-label-sm text-label-sm">Copyright © 2025 The MoneyGoal. All rights reserved.</p><div class="flex items-center gap-space-md font-label-sm text-label-sm"><span class="">EDUCATION ONLY • NOT FINANCIAL ADVICE</span></div></div></div></footer>
