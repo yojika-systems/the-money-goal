@@ -35,7 +35,9 @@ Provider maintenance may only suspend an existing registry entry. It cannot chan
 
 ## Measurement and privacy
 
-`wrangler.toml` declares the Analytics Engine dataset `themoneygoal_events` bound as `TMG_METRICS`. `/api/health` reports whether it is bound. `/api/events` accepts a fixed page and event allowlist. It stores event/page/market/tool/offer/placement plus a count. No identity, request headers, IPs, financial inputs or calculation results are written to that dataset. DNT/GPC disable optional events. This does not disable Cloudflare's own hosting/security processing. There are no custom analytics cookies and no claimed unique-user count.
+`wrangler.toml` declares the Analytics Engine dataset `themoneygoal_events` bound as `TMG_METRICS`. `/api/health` reports whether it is bound. `/api/events` accepts a fixed page and event allowlist. It stores event/page/market/tool/offer/placement plus a count. No identity, request headers, IPs, financial inputs or calculation results are written to that dataset. The browser sends optional events only after analytics consent; DNT/GPC override consent. This does not disable Cloudflare's own hosting/security processing. Aggregate endpoint counts are not unique-user counts.
+
+The owner's OpenSEO project is connected read-only to `sc-domain:themoneygoal.com` and GA4 property `471529141`, verified on 17 November 2026. The existing web stream is `G-1F9L70WQWL`. Google enhanced measurement is disabled: no automatic form, search, outbound-link or history collection. The site loads the Google library only after an affirmative choice and only on the production hostname. Page locations come from server-rendered canonicals with all query strings/fragments removed; referring URLs are reduced to their origin. Manual tool/link events use the same field allowlist as the aggregate endpoint. Advertising signals are disabled. Revocation sets Google's collection-disable flag and removes accessible `_ga` cookies; a preference lasts at most 180 days. Preview/local deployments do not load Google Analytics. Reports cover consented traffic and test activity may appear on the initial launch day.
 
 Owner query example in Cloudflare Analytics Engine:
 
@@ -47,7 +49,7 @@ WHERE timestamp >= NOW() - INTERVAL '28' DAY
 GROUP BY page, market, tool, offer
 ```
 
-`node scripts/report.mjs` creates an owner artifact with actual known spend and publication status. It reads Search Console only if `GOOGLE_SERVICE_ACCOUNT_JSON` is configured for a service account already granted read access to the property. Optional variables: `GSC_SITE_URL` and `GA4_PROPERTY_ID`. Missing integrations and approved commission data remain explicitly unknown. Do not make the owner report public or copy financial records into the site.
+`node scripts/report.mjs` creates an owner artifact with actual known spend and publication status. GitHub has no Google service-account credential; owner reporting can read the connected Search Console and GA4 properties through OpenSEO. The optional direct-runner reporting adapter reads Search Console only if `GOOGLE_SERVICE_ACCOUNT_JSON` is configured for a service account already granted read access to the property. Optional variables: `GSC_SITE_URL` and `GA4_PROPERTY_ID`. An unconfigured runner adapter does not mean the owner's OpenSEO connection is absent. Missing data and approved commissions remain explicitly unknown. The pre-launch GA4 organic report returned no rows for 16 August–15 November 2026. Do not make the owner report public or copy financial records into the site.
 
 ## CJ and affiliate accounts
 
