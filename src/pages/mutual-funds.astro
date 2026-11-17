@@ -15,32 +15,32 @@ const description =
  *  · return and inflation figures reframed as stated assumptions, not facts. */
 const POOLING = [
   { title: 'Many investors', body: 'Everyday individuals pool varying amounts — from as little as ₹500 a month — into a common trust.' },
-  { title: 'A fund manager', body: 'SEBI-registered portfolio specialists do the balance-sheet analysis and company research full-time.' },
-  { title: 'Spread across holdings', body: "Capital is diversified across dozens of India's largest listed companies, spanning technology, energy, banking and consumer goods." },
-  { title: 'Proportionate NAV', body: 'As the underlying companies grow and pay dividends, the Net Asset Value rises, and your folio moves with it.' },
+  { title: 'A fund manager', body: 'The scheme invests under its stated mandate. Active managers choose holdings; index schemes follow a stated benchmark.' },
+  { title: 'Spread across holdings', body: "Holdings depend on the scheme. Funds may own equity, debt or other assets, and concentration and credit risks vary." },
+  { title: 'Proportionate NAV', body: 'NAV reflects assets less liabilities per unit. It can rise or fall as holdings, income and costs change.' },
 ];
 
 const TYPES = [
-  { name: 'Large, mid & flexi cap', horizon: '5+ years', body: 'Invests at least 65% in listed company stocks. Flexi cap funds allocate dynamically across the top 500 businesses.' },
-  { name: 'Liquid & short duration', horizon: 'Under 3 years', body: 'Lends to government treasury bills and corporate paper. No stock-market volatility; suited to emergency funds and parked cash.' },
-  { name: 'Balanced advantage', horizon: '3–5 years', body: 'Rebalances between equity and debt automatically. Trims equity when markets rise, adds when they fall.' },
-  { name: 'Nifty 50 & Sensex trackers', horizon: '7+ years', body: "Mirrors the index mechanically with no manager discretion, at expense ratios often between 0.10% and 0.20%." },
-  { name: 'ELSS (tax saving)', horizon: '3-year lock-in', body: 'Deduction up to ₹1.5 lakh under Section 80C, with the shortest lock-in of the 80C options — PPF runs 15 years, tax-saving FDs 5.' },
+  { name: 'Large, mid & flexi cap', horizon: '5+ years', body: 'Equity schemes with different mandates and market-cap constraints. Read the current scheme documents rather than treating categories as interchangeable.' },
+  { name: 'Liquid & short duration', horizon: 'Under 3 years', body: 'Holds debt and money-market instruments. NAV can fall because of credit, interest-rate or liquidity risk; these are not insured deposits.' },
+  { name: 'Balanced advantage', horizon: '3–5 years', body: 'Changes equity and debt exposure under its own allocation model; methods and risks differ by scheme.' },
+  { name: 'Nifty 50 & Sensex trackers', horizon: '7+ years', body: "Seeks to follow an index. Costs and tracking differences vary and should be checked in current factsheets." },
+  { name: 'ELSS (tax saving)', horizon: '3-year lock-in', body: 'Has a statutory lock-in. Tax deductions depend on the applicable financial year and chosen tax regime; verify current rules before relying on a benefit.' },
 ];
 
 const ROADMAP = [
-  { n: 1, title: 'Define the horizon', body: 'When will you need this money? Under 3 years belongs in debt or liquid funds; over 5 years can carry equity.' },
-  { n: 2, title: 'Pick one fund class', body: 'A beginner needs one index fund or one well-regarded flexi cap. Owning a dozen overlapping funds is not diversification.' },
+  { n: 1, title: 'Define the horizon', body: 'Identify when money may be needed, whether losses are affordable, and how readily the product can be accessed.' },
+  { n: 2, title: 'Pick one fund class', body: 'Compare mandates, risks, charges and overlapping holdings. A category label does not establish suitability.' },
   { n: 3, title: 'Automate the SIP', body: 'Schedule the auto-debit a day or two after salary lands. It removes the monthly decision, which is the part that fails.' },
   { n: 4, title: 'Check direct plan and TER', body: 'Direct plans carry no distributor commission. The gap between direct and regular is what distribution costs you.' },
-  { n: 5, title: 'Stay put through dips', body: 'A falling NAV means the same instalment buys more units. Selling at the bottom is what turns volatility into loss.' },
+  { n: 5, title: 'Stay put through dips', body: 'A lower NAV buys more units for the same instalment, but this does not ensure recovery. Review the goal, risk and scheme documents.' },
 ];
 ---
 
 <Base title={`${title} | The MoneyGoal`} description={description}>
   <section class="border-b border-rule px-5 py-14 md:px-10 lg:px-20">
     <div class="mx-auto max-w-[1440px]">
-      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Investing</div>
+      <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">India · Investing</div>
       <h1 class="mb-6 max-w-[900px] font-serif text-[36px] font-bold leading-[1.14] tracking-tight md:text-[50px]">
         What a mutual fund actually does
       </h1>
@@ -144,4 +144,4 @@ const ROADMAP = [
       </p>
     </div>
   </section>
-</Base>
+<section class="mx-auto max-w-[1100px] px-5 pb-14 text-sm leading-relaxed text-ink3"><h2 class="mb-3 font-serif text-2xl">Sources and further reading</h2><p>Checked 17 November 2026: <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan">AMFI: direct and regular plans</a>; <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=riskInMutualFunds">AMFI: mutual fund risks</a>. Category horizons above are illustrative, not recommendations. <a href="/methodology">How we publish</a>.</p></section></Base>

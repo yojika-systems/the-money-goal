@@ -49,16 +49,16 @@ const { compact = false } = Astro.props;
             <label for="sip-return" class="text-sm text-ink3">Assumed annual return</label>
             <span class="num text-[19px] font-semibold text-caveat" id="sip-return-out">12.0%</span>
           </div>
-          <input type="range" id="sip-return" min="4" max="18" step="0.5" value="12" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
-          <div class="num mt-2 flex justify-between text-xs text-faint"><span>4%</span><span>18%</span></div>
+          <input type="range" id="sip-return" min="-20" max="18" step="0.5" value="12" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>-20%</span><span>18%</span></div>
         </div>
         <div>
           <div class="mb-2.5 flex items-baseline justify-between">
             <label for="sip-fee" class="text-sm text-ink3">Fund expense ratio</label>
             <span class="num text-[19px] font-semibold text-caveat" id="sip-fee-out">0.20%</span>
           </div>
-          <input type="range" id="sip-fee" min="0.05" max="2.25" step="0.05" value="0.2" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
-          <div class="num mt-2 flex justify-between text-xs text-faint"><span>0.05%</span><span>2.25%</span></div>
+          <input type="range" id="sip-fee" min="0" max="2.25" step="0.05" value="0.2" class="h-1 w-full cursor-pointer accent-[#A8442A]" />
+          <div class="num mt-2 flex justify-between text-xs text-faint"><span>0%</span><span>2.25%</span></div>
         </div>
       </div>
     </div>
@@ -142,7 +142,7 @@ const { compact = false } = Astro.props;
       el('sip-value-note').textContent = `after the ${(fee * 100).toFixed(2)}% fee`;
       el('sip-feecost').textContent = inrCompact(noFee - value);
       el('sip-assumes').textContent =
-        `You invest ${inr(monthly)} on the same day every month for ${years} years without missing one, starting from zero. The fund returns a constant ${(gross * 100).toFixed(1)}% a year before fees, and ${(fee * 100).toFixed(2)}% is deducted annually.`;
+        `You invest ${inr(monthly)} on the same day every month for ${years} years without missing one, starting from zero. The fund returns a constant ${(gross * 100).toFixed(1)}% a year before fees, and its annual fee is approximated by subtracting ${(fee * 100).toFixed(2)} percentage points from that rate before monthly compounding.`;
 
       // Bars: value stacked over amount invested, both scaled to the final value.
       const chart = el('sip-chart');
@@ -151,14 +151,14 @@ const { compact = false } = Astro.props;
       const marks = [];
       for (let y = step; y <= years; y += step) marks.push(y);
       if (marks[marks.length - 1] !== years) marks.push(years);
-      const peak = futureValue(monthly, net, years);
+      const peak = Math.max(futureValue(monthly, net, years), monthly * years * 12, 1);
       for (const y of marks) {
         const v = futureValue(monthly, net, y);
         const inv = monthly * y * 12;
         const col = document.createElement('div');
         col.className = 'flex flex-1 flex-col justify-end h-full';
         col.innerHTML =
-          `<div style="height:${(v / peak) * 100}%" class="bg-green"></div>` +
+          `<div style="height:${(Math.max(0, v - inv) / peak) * 100}%" class="bg-green"></div>` +
           `<div style="height:${(inv / peak) * 100}%" class="bg-[#C9DCD1]"></div>`;
         chart.appendChild(col);
       }

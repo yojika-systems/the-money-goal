@@ -1,67 +1,59 @@
 ---
-title: "What an expense ratio actually costs you over 25 years"
-description: "It is quoted as a number under two. Compounded across a working life it is the difference between two very different outcomes, and almost nobody does the arithmetic."
 pubDate: 2026-09-06
-updatedDate: 2026-09-06
-author: "Sathya Sankar"
-category: "Mutual funds"
-tags: ["mutual-funds", "expense-ratio", "sip", "index-funds"]
-lang: "en"
-translationKey: "expense-ratio-cost-over-25-years"
+author: The MoneyGoal editorial system
+lang: en
 draft: false
-affiliate: true
+contentType: evergreen
+aiAssisted: true
+reviewDue: 2027-02-15
+offerIds: []
+calculationRefs:
+  - expense-ratio-illustration
+verification:
+  status: verified
+  checkedAt: 2026-11-17
+  method: Primary-source inspection and independent calculation during implementation
+  reasons: []
+affiliate: false
+translationKey: expense-ratio-cost-over-25-years
+title: What an expense ratio costs over 25 years
+description: Compare two fund fees using a reproducible monthly-investment illustration. See how costs compound, which assumptions matter and what the example cannot tell you.
+updatedDate: 2026-11-17
+market: IN
+legacyUrl: true
+topic: investing
+category: Investing costs
+tags:
+  - mutual-funds
+  - expense-ratio
 sources:
-  - title: "Total expense ratio limits under the SEBI (Mutual Funds) Regulations"
-    publisher: "SEBI"
-    url: "https://www.sebi.gov.in/"
-    accessed: 2026-09-06
-  - title: "Direct and regular plans — what the difference is"
-    publisher: "AMFI"
-    url: "https://www.amfiindia.com/"
-    accessed: 2026-09-06
-  - title: "Illustration computed by The MoneyGoal; assumptions stated beside the table"
-    publisher: "The MoneyGoal"
-faq:
-  - q: "Is the expense ratio charged separately from my investment?"
-    a: "No. It is deducted from the fund's assets before the NAV is published, so the return you see is already net of the fee. You never see a separate debit."
-  - q: "Is a lower expense ratio always better?"
-    a: "Not automatically. It is one input among several, and comparing it across different fund categories tells you little. Comparing the direct and regular plans of the same fund is the comparison that isolates the distribution cost."
+  - id: amfi-direct
+    title: Direct and regular mutual fund plans
+    publisher: AMFI
+    url: https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan
+    accessed: 2026-11-17
+evidence:
+  - id: e1
+    claim: Direct and regular plans of a scheme have a common portfolio but different expenses.
+    sourceId: amfi-direct
+    excerpt: have different expense ratios
 ---
 
-Every mutual fund charges you for running it. That charge is the **expense ratio** — a percentage of the money you have invested, taken every year, whether the fund goes up or down.
+## The comparison that isolates distribution cost
+A direct and a regular plan belong to the same scheme, but carry different expenses. The direct route excludes distributor commission. Comparing those versions helps isolate that cost; comparing unrelated funds does not isolate it. [AMFI explains the distinction](#source-amfi-direct).
 
-It is quoted small. A fund might say 0.2%, another 1.6%. On ₹1,00,000 that is the difference between ₹200 and ₹1,600 in a year, which does not sound like the sort of thing that changes a life.
+## A worked example you can reproduce
+Consider hypothetical monthly contributions into two otherwise identical portfolios. The table below is generated from the same checked function used by our comparison calculator. It is not a comparison of actual funds.
 
-It compounds, though — and it compounds against you, every year, on a balance that is itself growing.
+CALCULATION_TABLE:expense-ratio-illustration
 
-## Where it is deducted from
+A gap of about ₹39.8 lakh in the final row follows from these assumptions. It is not money a particular fund is guaranteed to earn or lose. A different return path, fee or contribution schedule changes the result.
 
-You never see it leave your account. It is taken out of the fund's assets before the NAV is published, which means the return you see is already net of the fee. That invisibility is exactly why it goes unexamined.
+## What the model leaves out
+The model subtracts an annual fee from a constant nominal gross return before monthly compounding. This is an approximation of the effect of expenses, rather than a simulation of daily fund accounting. It excludes tax, inflation and exit loads. Do not subtract fees again from performance already quoted after expenses.
 
-SEBI caps the total expense ratio, and the cap varies by fund category and by how large the scheme is. Within that cap, what a fund charges is its own decision.
+## A demat account is not required for direct plans
+AMFI describes direct purchases through mutual fund websites and other channels, including physical applications. A broker or demat account is not a prerequisite for every direct-plan purchase. Product access and the type of plan available still need checking on the platform you use.
 
-## What a 1.4% gap costs over 25 years
-
-Take two funds holding the same things and earning the same gross return. One charges 0.2%, the other 1.6%. Here is ₹10,000 a month into each.
-
-| After | 0.2% fund | 1.6% fund | Difference |
-|---|---|---|---|
-| 10 years | ₹24.3 L | ₹22.6 L | ₹1.7 L |
-| 20 years | ₹90.1 L | ₹77.5 L | ₹12.6 L |
-| **25 years** | **₹1.65 Cr** | **₹1.37 Cr** | **₹28 L** |
-
-**Assumptions.** ₹10,000 invested at the start of every month, 12% a year gross nominal return before fees, the fee reducing the realised return, starting from zero, no withdrawals, no tax. This is an illustration of how a fee compounds — not a forecast, and not a claim about any specific fund. Real returns vary year to year and can be negative.
-
-Twenty-eight lakh is not a rounding error. It is a house deposit, or several years of retirement spending, handed over for a service that in an index fund's case is largely automated.
-
-## Direct versus regular plans
-
-Every scheme has two versions. The **regular** plan pays a commission to whoever sold it to you. The **direct** plan does not, and its expense ratio is lower by roughly that commission.
-
-Same fund, same manager, same holdings — the gap between the two is what distribution costs you, expressed as a number you can look up.
-
-## What to check before you invest
-
-The expense ratio is printed on every scheme's factsheet and on the AMC's website. Compare the direct plan against the regular plan of the same fund, and compare like with like: an index fund's ratio is not meaningfully comparable to an actively managed small-cap fund's.
-
-A lower fee is not the only thing that matters. It is, however, the only thing on the list you can know in advance with certainty.
+## Explore a different scenario
+Use the [expense ratio comparison calculator](/calculators/expense-ratio) to change returns, fees and payment timing. This page explains costs; it does not identify a suitable fund or recommend opening a brokerage account.

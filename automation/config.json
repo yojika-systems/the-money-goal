@@ -1,0 +1,38 @@
+{
+  "enabled": true,
+  "mode": "shadow-then-live",
+  "shadowDays": 7,
+  "maxCandidatesPerRun": 2,
+  "weeklyLimits": {
+    "evergreen": 4,
+    "news": 2,
+    "refresh": 2
+  },
+  "aiMonthlyLimitInr": 7000,
+  "totalMonthlyLimitInr": 25000,
+  "nonAiReserveInr": 18000,
+  "usdToInrBudgetRate": 100,
+  "model": "gpt-5.4-mini-2026-03-17",
+  "pricing": {
+    "inputPerMillionUsd": 0.75,
+    "outputPerMillionUsd": 4.5,
+    "checkedAt": "2026-11-17",
+    "reviewDue": "2026-12-17"
+  },
+  "maxInputCharacters": 48000,
+  "maxOutputTokens": 6000,
+  "requestTimeoutMs": 120000,
+  "maxRetries": 2,
+  "newsMaxAgeDays": 7,
+  "evergreenReviewDays": 90,
+  "providerTermsReviewDays": 7,
+  "pausedTopics": [
+    "insurance",
+    "crypto"
+  ],
+  "autoPublishMarkets": [
+    "global",
+    "IN",
+    "US"
+  ]
+}

@@ -18,7 +18,7 @@ export const EDUCATION_ONLY =
   'The MoneyGoal publishes general financial education and does not give personalised recommendations. It is not a SEBI-registered Investment Adviser or Research Analyst.';
 
 export const AFFILIATE_SHORT =
-  'Some links are partner links and we may be compensated when an account is opened through them; this does not change what you pay.';
+  'We may earn a commission when you use a clearly marked paid link. Compensation and eligibility depend on the provider; compare its official terms.';
 
 /** Renders without the AP number until OPERATOR.apRegistrationNumber is set. */
 export function credentialLine() {
@@ -47,7 +47,7 @@ export const GRIEVANCE_PATH = [
 export const WHAT_THIS_IS = [
   'Free explanations of how financial products work.',
   'Calculators that show every assumption.',
-  'Written by an Alice Blue authorised person.',
+  'Published by The MoneyGoal; AI use is disclosed.',
 ];
 
 export const WHAT_IT_ISNT = [

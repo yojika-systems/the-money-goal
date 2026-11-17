@@ -1,0 +1,5 @@
+---
+import Base from './Base.astro';
+const { title, description } = Astro.props;
+---
+<Base title={`${title} | The MoneyGoal`} description={description}><article class="prose prose-lg mx-auto max-w-[850px] px-5 py-14 prose-headings:font-serif prose-a:text-green md:px-10"><p class="text-sm uppercase tracking-wider text-muted">The MoneyGoal · Transparency</p><h1>{title}</h1><p class="text-sm text-muted">Updated 17 November 2026</p><slot /></article></Base>

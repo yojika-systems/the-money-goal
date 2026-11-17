@@ -7,36 +7,12 @@
  * are dropped: a ladder describes stages, it does not know which one you are on.
  */
 export const LADDER = [
-  {
-    "name": "Clarity and Budget",
-    "description": "Track every rupee, stop leaking cash into forgotten subscriptions, and uncover exact monthly living baseline requirements."
-  },
-  {
-    "name": "Debt Freedom",
-    "description": "Eliminate predatory high-interest liabilities: credit card rolls, BNPL loans, and consumer EMIs eating into real income velocity."
-  },
-  {
-    "name": "Stability Buffer",
-    "description": "3-6 months liquid emergency fund stored securely in high-yield liquid mutual funds or multi-bank sweep deposits."
-  },
-  {
-    "name": "Security and Defense",
-    "description": "Adequate pure Term Life (15-20x income) & Comprehensive Health Insurance shielding portfolio from catastrophic drawdowns."
-  },
-  {
-    "name": "Systematic Wealth",
-    "description": "Consistently investing ≥25% of net income into index funds, flexi-caps, and provident accounts on autopilot every single month."
-  },
-  {
-    "name": "Halfway Milestone",
-    "description": "The portfolio crosses the tipping point: dividends and conservative gains produce 50% of your annual living expenses effortlessly."
-  },
-  {
-    "name": "Financial Independence",
-    "description": "The classic FI point: The 4% safe withdrawal rule or 25x annual basic expenses accumulated. Working is now 100% voluntary."
-  },
-  {
-    "name": "Abundance and Freedom",
-    "description": "Complete serenity, philanthropic capabilities, multi-generational wealth preservation, and pursuing passions on your own calendar."
-  }
+  { name: 'Clarity and budget', description: 'Understand essential spending, irregular bills and the difference between income and available savings.' },
+  { name: 'Debt management', description: 'List balances, rates and minimum payments. Compare repayment methods and the cost of borrowing.' },
+  { name: 'Emergency buffer', description: 'Explore a cash reserve for unexpected costs. Access, deposit protection and potential investment loss differ by product and country.' },
+  { name: 'Protection', description: 'Understand policy benefits, exclusions and existing cover. Insurance needs depend on dependants, liabilities and local healthcare arrangements.' },
+  { name: 'Consistent saving', description: 'Explore a savings amount that fits cash flow and goals. No savings percentage or investment mix suits every household.' },
+  { name: 'Progress checks', description: 'Compare savings with an explicit target. Investment gains and income are variable; a rising balance is not guaranteed.' },
+  { name: 'Financial independence', description: 'Test spending, withdrawal-rate, inflation and longevity assumptions. A multiple of expenses is an illustration, not proof that a portfolio will last.' },
+  { name: 'Long-term choices', description: 'Revisit work, caring responsibilities, giving and estate arrangements as circumstances and local rules change.' },
 ];

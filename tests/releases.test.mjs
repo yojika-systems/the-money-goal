@@ -1,0 +1,5 @@
+import test from'node:test';import assert from'node:assert/strict';import{deploymentDecision}from'../scripts/lib/releases.mjs';
+const release={sha:'tested'};
+test('successful check alone cannot confirm the wrong deployed content',()=>{assert.equal(deploymentDecision({release,head:'tested',check:{status:'completed',conclusion:'success'},bodyMatches:false}),'pending');assert.equal(deploymentDecision({release,head:'tested',check:{status:'completed',conclusion:'success'},bodyMatches:true}),'verified');});
+test('failed deployment only reverts the exact head, preserving newer work',()=>{const check={status:'completed',conclusion:'failure'};assert.equal(deploymentDecision({release,head:'tested',check}),'rollback');assert.equal(deploymentDecision({release,head:'newer-user-work',check}),'hold-newer-work');});
+test('a delayed or missing deployment stays pending',()=>{assert.equal(deploymentDecision({release,head:'tested',check:null}),'pending');assert.equal(deploymentDecision({release,head:'tested',check:{status:'in_progress'}}),'pending');});

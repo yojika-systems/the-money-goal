@@ -1,53 +1,24 @@
 import { defineCollection, z } from 'astro:content';
 import { LANGUAGE_CODES, DEFAULT_LANG } from '../lib/languages.js';
-
-/* Blog collection.
- *
- * Field names are IDENTICAL to the Yojika monorepo's blog schema on purpose:
- * the content pipeline being ported writes exactly these keys, so keeping them
- * byte-compatible is what makes that pipeline portable without a rewrite.
- *
- * `translationKey` is the English slug, shared by all 12 language variants —
- * it is what joins them for the language switcher and the hreflang alternates.
- * There is no `canonical` field; canonical URLs are derived at render time so
- * they can never drift from the sitemap.
- *
- * `sources` has no counterpart in Yojika and is required here. A finance site
- * publishing an unsourced statistic is how "42,000+ learners" happened; the
- * content validator will refuse any numeric claim in the body that has no
- * matching entry.
- */
 const blog = defineCollection({
   type: 'content',
   schema: z.object({
-    title: z.string().max(70, 'Title over 70 chars will be truncated in search results'),
-    description: z.string().min(80).max(170),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    author: z.string().default('Sathya Sankar'),
-    category: z.string(),
-    tags: z.array(z.string()).default([]),
+    title: z.string().max(70), description: z.string().min(80).max(170),
+    pubDate: z.coerce.date(), updatedDate: z.coerce.date().optional(),
+    author: z.string().default('The MoneyGoal editorial system'),
+    category: z.string(), topic: z.string(), tags: z.array(z.string()).default([]),
     lang: z.enum(LANGUAGE_CODES as [string, ...string[]]).default(DEFAULT_LANG),
-    translationKey: z.string(),
-    heroImage: z.string().optional(),
-    ogImage: z.string().optional(),
-    draft: z.boolean().default(false),
-    /* Every factual claim needs a traceable source. */
-    sources: z
-      .array(
-        z.object({
-          title: z.string(),
-          publisher: z.string(),
-          url: z.string().url().optional(),
-          accessed: z.coerce.date().optional(),
-        }),
-      )
-      .default([]),
+    translationKey: z.string(), draft: z.boolean().default(true),
+    market: z.enum(['global', 'IN', 'US']), legacyUrl: z.boolean().default(false),
+    contentType: z.enum(['evergreen', 'news', 'comparison']),
+    aiAssisted: z.boolean().default(true), automationRunId: z.string().optional(),
+    reviewDue: z.coerce.date(), offerIds: z.array(z.string()).default([]),
+    calculationRefs: z.array(z.string()).default([]),
+    sources: z.array(z.object({ id: z.string(), title: z.string(), publisher: z.string(), url: z.string().url(), accessed: z.coerce.date(), published: z.coerce.date().optional(), effective: z.coerce.date().optional() })).min(1),
+    evidence: z.array(z.object({ id: z.string(), claim: z.string(), sourceId: z.string(), excerpt: z.string().max(1000) })).min(1),
+    verification: z.object({ status: z.enum(['draft', 'held', 'verified']), checkedAt: z.coerce.date(), method: z.string(), reasons: z.array(z.string()).default([]) }),
     faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
-    /* True when the article contains a partner link, so the layout can require
-     * the affiliate disclosure block above the first one. */
-    affiliate: z.boolean().default(false),
+    affiliate: z.boolean().default(false), heroImage: z.string().optional(), ogImage: z.string().optional(),
   }),
 });
-
 export const collections = { blog };

@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
+import { rehypeCalculations } from './src/lib/calculations.js';
 import tailwind from '@astrojs/tailwind';
 import rehypeExternalLinks from 'rehype-external-links';
 import { LANGUAGE_CODES, LANGUAGE_HREFLANGS, DEFAULT_LANG } from './src/lib/languages.js';
@@ -33,20 +32,12 @@ export default defineConfig({
   },
 
   integrations: [
-    mdx(),
-    /* The i18n option only works because language is the FIRST path segment
-     * (/hi/blog/x). @astrojs/sitemap matches locales against segment one, which
-     * is why the Yojika monorepo's /blog/<lang>/<slug> shape emits no
-     * xhtml:link annotations at all despite publishing in 12 languages. */
-    sitemap({
-      i18n: { defaultLocale: DEFAULT_LANG, locales: LANGUAGE_HREFLANGS },
-      filter: (page) => !page.endsWith('/404'),
-    }),
     tailwind({ applyBaseStyles: false }),
   ],
 
   markdown: {
     rehypePlugins: [
+      rehypeCalculations,
       [
         rehypeExternalLinks,
         {

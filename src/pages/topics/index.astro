@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import { TOPICS, isPublished } from '../../lib/publication.js';
+import { getCollection } from 'astro:content';
+const posts = await getCollection('blog', ({data}) => isPublished(data));
+const topics = TOPICS.filter(t => posts.some(p => p.data.topic === t.id));
+---
+<Base title="Explore money topics | The MoneyGoal" description="Explore budgeting, debt, financial independence, banking, credit cards and investing through sourced guides and calculators with transparent assumptions.">
+<section class="mx-auto max-w-[1100px] px-5 py-14 md:px-10"><p class="mb-4 text-xs uppercase tracking-wider text-green">Build your understanding</p><h1 class="mb-5 font-serif text-4xl font-bold md:text-5xl">Explore money topics</h1><p class="mb-10 max-w-[700px] text-lg leading-relaxed text-ink3">Start with the question you are trying to answer. Each guide identifies its country, sources and assumptions.</p><div class="grid gap-px border border-rule bg-rule md:grid-cols-2">{topics.map(t => <a href={`/topics/${t.id}`} class="bg-surface p-7"><h2 class="mb-3 font-serif text-2xl font-semibold">{t.name}</h2><p class="mb-4 leading-relaxed text-ink3">{t.description}</p><span class="text-sm text-green">Explore guides →</span></a>)}</div></section>
+</Base>

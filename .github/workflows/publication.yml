@@ -1,0 +1,74 @@
+name: MoneyGoal publication
+on:
+  schedule:
+    - cron: '17 3,15 * * *' # 08:47 and 20:47 IST
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: moneygoal-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      STATE_ENCRYPTION_KEY: ${{ secrets.STATE_ENCRYPTION_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CJ_API_TOKEN: ${{ secrets.CJ_API_TOKEN }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Recover previous deployment before generating
+        run: node scripts/monitor.mjs
+      - name: Check active offers and review queue
+        run: node scripts/maintenance.mjs
+      - name: Validate and apply a provider hold if needed
+        run: |
+          if ! git diff --quiet -- src/data/offers.json; then
+            npm run test
+            npm run verify
+            node scripts/publish-maintenance.mjs
+            node scripts/monitor.mjs
+          fi
+      - name: Discover, draft and challenge
+        id: pipeline
+        run: node scripts/pipeline.mjs
+      - name: Verify finance, evidence and rendered site
+        if: steps.pipeline.outputs.mode == 'shadow' || steps.pipeline.outputs.mode == 'live'
+        run: |
+          npm run test
+          npm run verify
+      - name: Record a successful shadow day
+        if: steps.pipeline.outputs.mode == 'shadow'
+        run: node scripts/record-shadow.mjs
+      - name: Publish only the verified content file
+        if: steps.pipeline.outputs.mode == 'live'
+        run: node scripts/publish.mjs
+      - name: Verify deployment and recover a failed release
+        if: steps.pipeline.outputs.mode == 'live'
+        run: node scripts/monitor.mjs
+      - name: Generate private owner report
+        if: always()
+        run: node scripts/report.mjs
+      - name: Encrypt run artifacts
+        if: always()
+        run: node scripts/seal-artifacts.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: moneygoal-run-${{ github.run_id }}
+          path: automation-artifacts/
+          retention-days: 30
+      - name: Mark material failures in the run summary
+        if: failure()
+        run: echo 'Publication held. Inspect failed checks and the run artifact; no further article will publish until recovery completes.' >> "$GITHUB_STEP_SUMMARY"

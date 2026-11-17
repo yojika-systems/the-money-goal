@@ -8,7 +8,7 @@ export const NAV = [
   { label: 'Guides', href: '/guides' },
   { label: 'Mutual funds', href: '/mutual-funds' },
   { label: 'Financial freedom', href: '/financial-freedom' },
-  { label: 'Money mistakes', href: '/money-mistakes' },
+  { label: 'Topics', href: '/topics' },
   { label: 'Financial health', href: '/financial-health' },
   { label: 'Calculators', href: '/calculators' },
 ];
@@ -22,12 +22,17 @@ export const FOOTER_NAV = {
   ],
   Tools: [
     { label: 'SIP calculator', href: '/calculators' },
+    { label: 'Expense ratio comparison', href: '/calculators/expense-ratio' },
+    { label: 'Debt payoff comparison', href: '/calculators/debt-payoff' },
+    { label: 'Card fee break-even', href: '/calculators/card-fee' },
     { label: 'Freedom planner', href: '/financial-freedom' },
     { label: 'Health check', href: '/financial-health' },
   ],
   Transparency: [
     { label: 'How we make money', href: '/partner' },
-    { label: 'Partner disclosure', href: '/partner' },
-    { label: 'All guides', href: '/guides' },
+    { label: 'Affiliate disclosure', href: '/affiliate-disclosure' },
+    { label: 'How we publish', href: '/methodology' },
+    { label: 'Corrections', href: '/corrections' },
+    { label: 'Privacy', href: '/privacy' },
   ],
 };
