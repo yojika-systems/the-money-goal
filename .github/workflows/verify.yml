@@ -19,3 +19,5 @@ jobs:
       - run: npm ci
       - run: npm run test
       - run: npm run verify
+      - name: Verify the site builds with every paid offer held
+        run: node scripts/check-offer-hold.mjs

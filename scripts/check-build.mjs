@@ -16,6 +16,7 @@
  */
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { getOffer } from '../src/lib/offers.js';
 
 const DIST = 'dist';
 const fail = [];
@@ -73,6 +74,12 @@ for (const file of pages) {
   }
 
   if (/CALCULATION_TABLE:/.test(html)) fail.push(`${at}: calculation marker was not rendered`);
+  for(const link of html.matchAll(/<a\b[^>]*\bdata-offer="([^"]+)"[^>]*>/g)){
+    const rel=(link[0].match(/\brel="([^"]*)"/)?.[1]??'').split(/\s+/);
+    const market=link[0].match(/\bdata-market="([^"]*)"/)?.[1];
+    if(!rel.includes('noopener')||!rel.includes('sponsored'))fail.push(`${at}: paid link is missing sponsored/noopener disclosure attributes`);
+    if(!getOffer(link[1],market))fail.push(`${at}: an unavailable paid offer rendered`);
+  }
   const dead = (html.match(/href="#"/g) ?? []).length;
   if (dead) fail.push(`${at}: ${dead} dead href="#" link(s)`);
 
@@ -97,13 +104,6 @@ for (const file of pages) {
 if (!existsSync(join(DIST, '404.html'))) fail.push('no 404.html — every unknown URL becomes a soft-404');
 for (const f of ['_headers', '_redirects', 'robots.txt', 'favicon.svg'])
   if (!existsSync(join(DIST, f))) warn.push(`${f} missing from the build output`);
-
-const partner = pages.find((p) => p.endsWith('partner.html'));
-if (partner) {
-  const html = readFileSync(partner, 'utf8');
-  if (!/rel="noopener sponsored"/.test(html))
-    fail.push('partner.html: affiliate link is missing rel="noopener sponsored"');
-}
 
 for (const w of warn) console.warn(`  warn: ${w}`);
 if (fail.length) {
