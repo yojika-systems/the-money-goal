@@ -1,7 +1,9 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import { validateEvent } from '../src/lib/events.js';
 import { onRequest } from '../functions/api/events.js';
-import { onRequestGet as redirectOffer } from '../functions/api/offer.js';
+import { createOfferHandler } from '../src/lib/offer-endpoint.js';
+import { offers } from '../src/lib/offers.js';
+const redirectOffer=createOfferHandler(offers);
 test('only aggregate fields can enter the event dataset',()=>{const event={event:'tool_completion',tool:'debt-payoff',page:'/calculators/debt-payoff'};assert.ok(validateEvent(event));for(const key of ['income','balance','debt','userId','email','ip','result','query'])assert.equal(validateEvent({...event,[key]:'private'}),null);assert.equal(validateEvent({...event,page:'/calculators?income=1'}),null);});
 test('cross-origin events are rejected without writing a datapoint',async()=>{let calls=0;const r=await onRequest({request:new Request('https://themoneygoal.com/api/events',{method:'POST',headers:{Origin:'https://other.example','Content-Type':'application/json'},body:'{}'}),env:{TMG_METRICS:{writeDataPoint(){calls++;}}}});assert.equal(r.status,403);assert.equal(calls,0);});
 test('valid events omit network headers and all financial values',async()=>{let point;const r=await onRequest({request:new Request('https://themoneygoal.com/api/events',{method:'POST',headers:{Origin:'https://themoneygoal.com','Content-Type':'application/json','CF-Connecting-IP':'1.2.3.4'},body:JSON.stringify({event:'tool_completion',page:'/calculators/card-fee',tool:'card-fee'})}),env:{TMG_METRICS:{writeDataPoint(p){point=p;}}}});assert.equal(r.status,204);assert.ok(!JSON.stringify(point).includes('1.2.3.4'));assert.deepEqual(point.doubles,[1]);});
