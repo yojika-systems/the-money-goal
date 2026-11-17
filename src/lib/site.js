@@ -15,10 +15,10 @@
 export const SITE = {
   url: 'https://themoneygoal.com',
   name: 'The MoneyGoal',
-  tagline: 'Independent financial education · India',
+  tagline: 'Financial education · Global basics, India & US',
   description:
-    'Learn how money works in plain language — budgeting, mutual funds, SIPs and building financial freedom. Free educational guides for Indian investors.',
-  locale: 'en_IN',
+    'Learn how money works in plain language — budgeting, mutual funds, SIPs and building financial freedom. Free educational guides, with clearly labelled India and US coverage.',
+  locale: 'en_US',
   startYear: 2026,
 };
 

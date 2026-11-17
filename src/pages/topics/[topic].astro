@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { TOPICS, isPublished } from '../../lib/publication.js';
+import { getCollection } from 'astro:content';
+export async function getStaticPaths() {
+ const all = await getCollection('blog', ({data}) => isPublished(data));
+ return TOPICS.filter(topic => all.some(p => p.data.topic === topic.id)).map(topic => ({params:{topic:topic.id}, props:{topic}}));
+}
+const { topic } = Astro.props;
+const posts = (await getCollection('blog', ({data}) => isPublished(data) && data.topic === topic.id && data.lang === 'en')).sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<Base title={`${topic.name}: guides and tools | The MoneyGoal`} description={`${topic.description} Read clear, sourced explanations with country labels, calculation methods and useful practical examples.`}><section class="mx-auto max-w-[1100px] px-5 py-14 md:px-10"><a href="/topics" class="text-sm">← All topics</a><h1 class="mb-5 mt-6 font-serif text-4xl font-bold">{topic.name}</h1><p class="mb-6 text-lg text-ink3">{topic.description}</p><PostList posts={posts} /></section></Base>

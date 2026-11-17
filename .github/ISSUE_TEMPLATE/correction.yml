@@ -1,0 +1,25 @@
+name: Report a correction
+description: Flag a factual, source, calculation or accessibility problem. Reports are public.
+title: 'Correction: '
+body:
+  - type: markdown
+    attributes:
+      value: 'This report is public. Do not include account numbers, financial balances, identity documents or other private information.'
+  - type: input
+    id: page
+    attributes:
+      label: Page URL
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: Statement or behaviour to check
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting primary source or reproducible calculation
+    validations:
+      required: true

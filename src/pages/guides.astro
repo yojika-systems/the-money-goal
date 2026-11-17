@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { dmyLong } from '../lib/format.js';
+import { isPublished, postHref } from '../lib/publication.js';
 import { LANGUAGES, DEFAULT_LANG, articleHref } from '../lib/languages.js';
 
 /* Replaces two overlapping pages: /learn, which advertised 42 lessons and 23
@@ -24,12 +25,12 @@ const GUIDES = [
 
 /* Pipeline articles, newest first. Empty until the content pipeline lands, and
  * the section simply does not render — no "coming soon" placeholder. */
-const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === DEFAULT_LANG))
+const posts = (await getCollection('blog', ({ data }) => isPublished(data) && data.lang === DEFAULT_LANG))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const title = 'Every guide we have published';
 const description =
-  'Free, plain-language guides to mutual funds, financial freedom, credit and personal finance for Indian beginners. No account, nothing collected.';
+  'Free, plain-language guides to mutual funds, financial freedom, credit and personal finance with country labels and exact sources. No account needed.';
 ---
 
 <Base title={`${title} | The MoneyGoal`} description={description}>
@@ -39,7 +40,7 @@ const description =
         {title}
       </h1>
       <p class="max-w-[660px] text-[17px] leading-[1.7] text-ink3 md:text-[18px]">
-        Free to read, no account, nothing collected about you. Every guide states its assumptions
+        Free to read, with no account. Calculator inputs stay in your browser. Every guide states its assumptions
         and says plainly what it is not.
       </p>
     </div>
@@ -67,7 +68,7 @@ const description =
           <a href="/blog" class="text-[14.5px]">All {posts.length} &rarr;</a>
         </div>
         {posts.slice(0, 6).map((post) => (
-          <a href={articleHref(DEFAULT_LANG, post.slug)} class="block border-b border-rule py-6">
+          <a href={postHref(post)} class="block border-b border-rule py-6">
             <div class="mb-2 flex flex-wrap items-center gap-3">
               <span class="text-[11.5px] uppercase tracking-[0.08em] text-green">{post.data.category}</span>
               <span class="text-[13px] text-faint">{dmyLong(post.data.pubDate)}</span>
@@ -85,7 +86,7 @@ const description =
       <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Read in your language</div>
       <div class="flex flex-wrap gap-2.5">
         {
-          LANGUAGES.map((l) => (
+          LANGUAGES.filter(l => posts.some(p => p.data.lang === l.code)).map((l) => (
             <a
               href={l.code === DEFAULT_LANG ? '/blog' : `/${l.code}/blog`}
               lang={l.code}

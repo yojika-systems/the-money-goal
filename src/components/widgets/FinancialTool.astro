@@ -1,0 +1,89 @@
+---
+import { compareExpenses, debtPayoff, cardBreakEven } from '../../lib/finance.js';
+interface Props { kind: 'expense-ratio' | 'debt-payoff' | 'card-fee' }
+const { kind } = Astro.props;
+const expenseFields = [ ['monthly', 'Monthly contribution', 10000, 0, 100000000, 1], ['years', 'Years', 25, 1, 100, 1], ['gross', 'Nominal gross annual return (%)', 12, -50, 50, .1], ['lowFee', 'Lower annual expense ratio (%)', .2, 0, 20, .01], ['highFee', 'Higher annual expense ratio (%)', 1.6, 0, 20, .01] ];
+const cardFields = [ ['spend', 'Total annual spending', 18000, 0, 1000000000, .01], ['excluded', 'Spending excluded from rewards', 0, 0, 1000000000, .01], ['fee', 'Annual card fee', 120, 0, 1000000, .01], ['feeRate', 'Fee-card reward rate (%)', 4, 0, 100, .01], ['freeRate', 'No-fee alternative reward rate (%)', 2, 0, 100, .01], ['interest', 'Annual interest cost to subtract', 0, 0, 1000000000, .01], ['otherFees', 'Other annual fees to subtract', 0, 0, 1000000000, .01] ];
+const fields = kind === 'expense-ratio' ? expenseFields : kind === 'card-fee' ? cardFields : [];
+const initialExpense = compareExpenses({ monthly:10000, years:25, gross:.12, lowFee:.002, highFee:.016 });
+const initialCard = cardBreakEven({spend:18000,fee:120,feeRate:.04,freeRate:.02});
+const initialDebts = [{balance:8000,apr:24,minimum:200},{balance:2000,apr:8,minimum:100}];
+const defaults = kind === 'expense-ratio' ? [['Lower-fee value', initialExpense.low], ['Higher-fee value', initialExpense.high], ['Fee difference', initialExpense.difference]] : kind === 'card-fee' ? [['Extra rewards', initialCard.extraRewards], ['Net annual benefit', initialCard.net], ['First break-even eligible spend', initialCard.breakEven]] : ['avalanche','snowball'].map(strategy => { const r=debtPayoff(initialDebts,500,strategy); return [strategy === 'avalanche' ? 'Avalanche interest' : 'Snowball interest', r.interest]; });
+const units = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n);
+---
+<div class="financial-tool border border-rule bg-surface" data-tool={kind}>
+ <form class="p-5 md:p-8">
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-rule pb-5"><h2 class="font-serif text-2xl font-semibold">Try your assumptions</h2><label class="flex items-center gap-3 text-sm">Display currency<select name="currency" class="tool-input"><option value="INR">INR · ₹</option><option value="USD">USD · $</option></select></label></div>
+  <p class="mb-6 text-sm leading-relaxed text-muted">Currency changes the display only, without currency conversion. This model does not apply any country’s tax or product rules. Inputs stay in your browser.</p>
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{fields.map(([name,label,value,min,max,step]) => <label class="block text-sm font-medium">{label}<input class="tool-input mt-2 w-full" name={String(name)} type="number" value={value} min={min} max={max} step={step} required inputmode="decimal" /></label>)}</div>
+  {kind === 'expense-ratio' && <label class="mt-5 block text-sm font-medium">Contribution timing<select name="timing" class="tool-input mt-2 w-full sm:w-auto sm:min-w-[260px]"><option value="start">Beginning of each month</option><option value="end">End of each month</option></select></label>}
+  {kind === 'card-fee' && <label class="mt-5 block text-sm font-medium">Annual fee-card reward cap (leave empty for no cap)<input class="tool-input mt-2 w-full sm:max-w-[300px]" type="number" name="cap" min="0" max="1000000000" step="0.01" inputmode="decimal" /></label>}
+  {kind === 'debt-payoff' && <div><div class="mb-5 overflow-x-auto"><table class="w-full min-w-[520px] text-left text-sm"><thead><tr><th scope="col">Debt</th><th scope="col">Balance</th><th scope="col">APR (%)</th><th scope="col">Monthly minimum</th><th scope="col">Remove</th></tr></thead><tbody data-debts>{initialDebts.map((d,i) => <tr><th scope="row">Debt {i+1}</th><td><input aria-label={`Debt ${i+1} balance`} class="tool-input w-full" type="number" name="balance" value={d.balance} min="0" max="1000000000" step="0.01" required /></td><td><input aria-label={`Debt ${i+1} APR`} class="tool-input w-full" type="number" name="apr" value={d.apr} min="0" max="200" step="0.01" required /></td><td><input aria-label={`Debt ${i+1} minimum`} class="tool-input w-full" type="number" name="minimum" value={d.minimum} min="0.01" max="1000000000" step="0.01" required /></td><td><button type="button" data-remove class="tool-secondary">Remove</button></td></tr>)}</tbody></table></div><button class="tool-secondary" type="button" data-add>Add a debt</button><label class="mt-5 block text-sm font-medium">Total monthly budget, including all minimums<input class="tool-input mt-2 w-full sm:max-w-[300px]" type="number" name="budget" value="500" min="0.01" max="1000000000" step="0.01" required /></label></div>}
+  <div class="mt-7 flex flex-wrap gap-4"><button type="submit" class="bg-green px-6 py-3 font-medium text-paper">Calculate</button><button type="reset" class="tool-secondary">Reset example</button></div>
+  <p data-error role="alert" class="mt-4 text-sm font-medium text-caveat"></p>
+ </form>
+ <section class="border-t border-rule bg-tint p-5 md:p-8" aria-live="polite" aria-atomic="true"><h2 class="mb-5 font-serif text-2xl font-semibold">Illustrative result</h2><dl data-summary class="grid gap-5 sm:grid-cols-3">{defaults.map(([label,value]) => <div><dt class="mb-2 text-sm text-muted">{label}</dt><dd class="num font-serif text-2xl font-semibold text-green">{units(Number(value))} money units</dd></div>)}</dl><p data-result-note class="mt-5 text-sm leading-relaxed text-ink3">Default example shown. Use Calculate for currency formatting and a detailed schedule. Results illustrate your assumptions; they do not predict an investment or borrowing outcome.</p><div data-schedule class="mt-6 max-h-[420px] overflow-auto"></div></section>
+ <noscript><p class="p-5 text-sm">JavaScript is needed to change these inputs. The default example above is rendered without JavaScript. Read the calculation method below.</p></noscript>
+</div>
+<script>
+ import { compareExpenses, debtPayoff, cardBreakEven } from '../../lib/finance.js';
+ import { track } from '../../lib/measurement.js';
+ for (const root of document.querySelectorAll<HTMLElement>('.financial-tool')) {
+  const form=root.querySelector<HTMLFormElement>('form')!;
+  const kind=root.dataset.tool;
+  const number=(name:string) => Number((form.elements.namedItem(name) as HTMLInputElement).value);
+  const el=(tag:string, text:string) => { const n=document.createElement(tag);n.textContent=text;return n; };
+  const run=(record=false) => {
+   const error=root.querySelector<HTMLElement>('[data-error]')!;
+   const summary=root.querySelector<HTMLElement>('[data-summary]')!;
+   const schedule=root.querySelector<HTMLElement>('[data-schedule]')!;
+   try {
+    if (!form.checkValidity()) { summary.replaceChildren();schedule.replaceChildren();error.textContent='Check the highlighted inputs. No valid result is available.';return; }
+    const currency=(form.elements.namedItem('currency') as HTMLSelectElement).value;
+    const money=(n:number) => new Intl.NumberFormat(currency==='INR'?'en-IN':'en-US',{style:'currency',currency,maximumFractionDigits:2}).format(n);
+    let results:[string,string][]=[];
+    let rows:(string|number)[][]=[];
+    let headers:string[]=[];
+    let note='';
+    if (kind==='expense-ratio') {
+     const input={monthly:number('monthly'),years:number('years'),gross:number('gross')/100,lowFee:number('lowFee')/100,highFee:number('highFee')/100,timing:(form.elements.namedItem('timing') as HTMLSelectElement).value};
+     const r=compareExpenses(input);
+     results=[['Lower-fee value',money(r.low)],['Higher-fee value',money(r.high)],['Difference',money(r.difference)]];
+     headers=['Year','Contributed','Lower-fee value','Higher-fee value','Difference'];
+     rows=Array.from({length:input.years},(_,i)=>{const t=compareExpenses({...input,years:i+1});return [i+1,money(t.invested),money(t.low),money(t.high),money(t.difference)];});
+     note='Constant nominal gross return less annual fees, compounded monthly. No inflation, tax or exit loads. Use a before-fee return; published fund performance may already be net of expenses. Negative returns are possible.';
+    } else if (kind==='debt-payoff') {
+     const debts=Array.from(root.querySelectorAll<HTMLTableRowElement>('[data-debts] tr')).map(row=>({balance:Number(row.querySelector<HTMLInputElement>('[name=balance]')!.value),apr:Number(row.querySelector<HTMLInputElement>('[name=apr]')!.value),minimum:Number(row.querySelector<HTMLInputElement>('[name=minimum]')!.value)}));
+     const a=debtPayoff(debts,number('budget'),'avalanche');const b=debtPayoff(debts,number('budget'),'snowball');
+     results=[['Avalanche',a.paidOff?`${a.months} months · ${money(a.interest)} interest`:`Not cleared in ${a.months} months`],['Snowball',b.paidOff?`${b.months} months · ${money(b.interest)} interest`:`Not cleared in ${b.months} months`],['Interest difference',a.paidOff&&b.paidOff?money(b.interest-a.interest):'No complete payoff comparison']];
+     headers=['Month','Avalanche balance','Snowball balance'];
+     rows=Array.from({length:Math.max(a.schedule.length,b.schedule.length)},(_,i)=>[i+1,money(a.schedule[i]?.balance??0),money(b.schedule[i]?.balance??0)]);
+     note='Monthly interest at APR/12, fixed minimums, no new borrowing or fees, and the same total budget throughout. Freed payments are reused. Actual lender rules may differ. A result that stops at 1,200 months is incomplete.';
+    } else {
+     const capInput=(form.elements.namedItem('cap') as HTMLInputElement).value;
+     const r=cardBreakEven({spend:number('spend'),fee:number('fee'),feeRate:number('feeRate')/100,freeRate:number('freeRate')/100,excluded:number('excluded'),interest:number('interest'),otherFees:number('otherFees'),cap:capInput===''?Infinity:Number(capInput)});
+     results=[['Extra rewards',money(r.extraRewards)],['Net annual benefit',money(r.net)],['First break-even eligible spend',r.breakEven===null?'No break-even under these assumptions':money(r.breakEven)]];
+     note='Same eligible spend on both cards; reward caps apply only to the fee card. Fees and entered interest are subtracted. Welcome bonuses, taxes and non-cash perks are excluded. With a cap, higher spending can make the fee card worse again.';
+    }
+    summary.replaceChildren(...results.map(([label,value])=>{const div=el('div','');const dt=el('dt',label);dt.className='mb-2 text-sm text-muted';const dd=el('dd',value);dd.className='num font-serif text-2xl font-semibold text-green';div.append(dt,dd);return div;}));
+    schedule.replaceChildren();
+    if(rows.length){const table=el('table','');table.className='w-full min-w-[520px] text-left text-sm';const head=el('thead','');const tr=el('tr','');for(const h of headers){const th=el('th',h);th.setAttribute('scope','col');tr.append(th);}head.append(tr);const body=el('tbody','');for(const row of rows){const tr=el('tr','');for(const cell of row)tr.append(el('td',String(cell)));body.append(tr);}table.append(head,body);schedule.append(table);}
+    root.querySelector<HTMLElement>('[data-result-note]')!.textContent=note;error.textContent='';
+    if(record)track('tool_completion',{tool:kind});
+   }catch(e){summary.replaceChildren();schedule.replaceChildren();error.textContent=e instanceof Error?e.message:'The calculation could not be completed.';root.querySelector<HTMLElement>('[data-result-note]')!.textContent='Change the inputs and calculate again. No valid result is available.';}
+  };
+  const initialRows=Array.from(root.querySelectorAll('[data-debts] tr')).map(row=>row.cloneNode(true));
+  const renumber=()=>{Array.from(root.querySelectorAll('[data-debts] tr')).forEach((row,i)=>{row.querySelector('th')!.textContent=`Debt ${i+1}`;for(const input of row.querySelectorAll<HTMLInputElement>('input'))input.setAttribute('aria-label',`Debt ${i+1} ${input.name}`);});};
+  form.addEventListener('submit',e=>{e.preventDefault();run(true);});
+  form.addEventListener('reset',()=>setTimeout(()=>{const tbody=root.querySelector('[data-debts]');if(tbody)tbody.replaceChildren(...initialRows.map(row=>row.cloneNode(true)));run();},0));
+  root.addEventListener('click',e=>{
+   const button=(e.target as HTMLElement).closest('button');
+   if(button?.hasAttribute('data-add')){
+    const rows=root.querySelectorAll('[data-debts] tr');if(rows.length>=10)return;
+    const row=rows[0].cloneNode(true) as HTMLTableRowElement;const index=rows.length+1;row.querySelector('th')!.textContent=`Debt ${index}`;for(const input of row.querySelectorAll<HTMLInputElement>('input')){input.value=input.name==='minimum'?'1':'0';input.setAttribute('aria-label',`Debt ${index} ${input.name}`);}root.querySelector('[data-debts]')!.append(row);renumber();
+   }
+   if(button?.hasAttribute('data-remove')&&root.querySelectorAll('[data-debts] tr').length>1){button.closest('tr')!.remove();renumber();}
+  });
+  run();
+ }
+</script>

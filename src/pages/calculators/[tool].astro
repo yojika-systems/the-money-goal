@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import FinancialTool from '../../components/widgets/FinancialTool.astro';
+const tools={
+ 'expense-ratio':{title:'Expense ratio comparison calculator',description:'Compare how two annual expense ratios change monthly investment scenarios. Adjust gross returns, contribution timing and fees, with a year-by-year table.',method:'sip-method',notes:'Use hypothetical gross returns, not a promise about any fund. A lower expense ratio does not establish that a fund is suitable. Published fund returns generally already reflect expenses.'},
+ 'debt-payoff':{title:'Debt avalanche vs snowball calculator',description:'Compare debt repayment strategies with the same monthly budget. See payoff months, interest and remaining balances using transparent, adjustable assumptions.',method:'debt-method',notes:'Avalanche directs extra payments to the highest APR; snowball directs them to the smallest balance. Both pay each entered minimum first. A budget that cannot cover minimums is rejected.'},
+ 'card-fee':{title:'Credit card annual-fee break-even calculator',description:'Compare incremental rewards with an annual card fee. Include exclusions, reward caps, interest and other fees before calculating an illustrative net benefit.',method:'card-method',notes:'Enter the reward value you can actually redeem, not a headline points rate. The comparison uses a no-fee alternative, not a zero-reward baseline. No applications or product approvals happen here.'}
+};
+export function getStaticPaths(){return ['expense-ratio','debt-payoff','card-fee'].map(tool=>({params:{tool}}));}
+const tool=Astro.params.tool;
+const d=tools[tool];
+---
+<Base title={`${d.title} | The MoneyGoal`} description={d.description}>
+<section class="mx-auto max-w-[1200px] px-5 py-12 md:px-10"><a class="text-sm" href="/calculators">← All calculators</a><p class="mb-4 mt-7 text-xs uppercase tracking-wider text-green">Global method · INR or USD display</p><h1 class="mb-5 max-w-[950px] font-serif text-4xl font-bold leading-tight md:text-5xl">{d.title}</h1><p class="mb-6 max-w-[800px] text-lg leading-relaxed text-ink3">{d.description}</p><p class="mb-9 max-w-[800px] text-sm leading-relaxed text-muted">{d.notes}</p><FinancialTool kind={tool} /><section class="mt-10 max-w-[800px] text-ink3"><h2 class="mb-4 font-serif text-2xl font-semibold">Method and limitations</h2><p class="mb-4 leading-relaxed">This is an educational model, not investment advice, a credit decision or a prediction. Inputs stay in your browser. Change one assumption at a time to see its effect.</p><a href={`/methodology#${d.method}`}>Read the formula, assumptions and exclusions →</a></section></section>
+</Base>

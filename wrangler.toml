@@ -13,3 +13,8 @@
 name = "the-money-goal"
 compatibility_date = "2026-09-06"
 pages_build_output_dir = "dist"
+
+# Aggregate events contain no identifiers or calculator inputs.
+[[analytics_engine_datasets]]
+binding = "TMG_METRICS"
+dataset = "themoneygoal_events"

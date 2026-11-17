@@ -64,4 +64,13 @@ const isCurrent = (href: string) => path === href || path.startsWith(href + '/')
       </details>
     </div>
   </div>
+  <nav aria-label="Reader market" class="border-t border-rule bg-tint">
+    <div class="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 text-xs text-ink3 md:px-10 lg:px-20">
+      <span class="uppercase tracking-wider text-muted">Read for</span>
+      <a href="/global" aria-current={path === '/global' ? 'page' : undefined}>Global basics</a>
+      <a href="/in" aria-current={path.startsWith('/in') && !path.startsWith('/index') ? 'page' : undefined}>India · INR</a>
+      <a href="/us" aria-current={path.startsWith('/us') ? 'page' : undefined}>United States · USD</a>
+      <a href="/news" class="ml-auto">Economy &amp; policy</a>
+    </div>
+  </nav>
 </header>

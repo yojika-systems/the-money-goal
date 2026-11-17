@@ -1,0 +1,10 @@
+[
+  {"id":"fed","publisher":"Federal Reserve Board","market":"US","hosts":["www.federalreserve.gov","federalreserve.gov"],"feed":"https://www.federalreserve.gov/feeds/press_monetary.xml","primary":true},
+  {"id":"bls","publisher":"Bureau of Labor Statistics","market":"US","hosts":["www.bls.gov","bls.gov"],"feed":"https://www.bls.gov/feed/cpi.rss","primary":true},
+  {"id":"sebi","publisher":"SEBI","market":"IN","hosts":["www.sebi.gov.in","sebi.gov.in"],"feed":"https://www.sebi.gov.in/sebirss.xml","primary":true},
+  {"id":"rbi","publisher":"Reserve Bank of India","market":"IN","hosts":["www.rbi.org.in","rbi.org.in","rbi.org.in"],"feed":"https://www.rbi.org.in/pressreleases_rss.xml","primary":true},
+  {"id":"amfi","publisher":"AMFI","market":"IN","hosts":["www.amfiindia.com","amfiindia.com"],"primary":true},
+  {"id":"cfpb","publisher":"Consumer Financial Protection Bureau","market":"US","hosts":["www.consumerfinance.gov","consumerfinance.gov","files.consumerfinance.gov"],"primary":true},
+  {"id":"investor-gov","publisher":"US Securities and Exchange Commission Investor.gov","market":"US","hosts":["www.investor.gov","investor.gov"],"primary":true},
+  {"id":"alice-blue","publisher":"Alice Blue","market":"IN","hosts":["aliceblueonline.com","www.aliceblueonline.com","ekyc.aliceblueonline.com"],"primary":true}
+]

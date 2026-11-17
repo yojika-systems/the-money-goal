@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getCollection } from 'astro:content';
+import { isPublished, MARKETS } from '../../lib/publication.js';
+export function getStaticPaths() { return Object.keys(MARKETS).map(market => ({ params: { market: market === 'global' ? 'global' : market.toLowerCase() }, props: { market } })); }
+const { market } = Astro.props;
+const posts = (await getCollection('blog', ({ data }) => isPublished(data) && data.market === market && data.lang === 'en')).sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const title = market === 'global' ? 'Money concepts that travel with you' : `${MARKETS[market]}: financial guides`;
+---
+<Base title={`${MARKETS[market]} financial education | The MoneyGoal`} description={`Learn about money with ${MARKETS[market]} coverage. Read sourced explanations and transparent worked examples before comparing any financial product.`}>
+<section class="mx-auto max-w-[1100px] px-5 py-14 md:px-10"><p class="mb-4 text-xs uppercase tracking-wider text-green">{MARKETS[market]} · {market === 'IN' ? 'INR' : market === 'US' ? 'USD' : 'Currency-neutral concepts'}</p><h1 class="mb-5 font-serif text-4xl font-bold md:text-5xl">{title}</h1><p class="mb-7 max-w-[720px] text-lg leading-relaxed text-ink3">{market === 'global' ? 'Budgeting, debt, compounding and financial independence. Examples explain a method; local tax and product rules need a country-specific source.' : 'Rules, terminology and product access differ between countries. These guides identify the market and the documents behind each explanation.'}</p>{market === 'IN' && <div class="mb-7 flex flex-wrap gap-5 border-y border-rule py-4 text-sm"><a href="/mutual-funds">Mutual fund basics</a><a href="/partner">Demat accounts &amp; Alice Blue disclosure</a><a href="/financial-health">Financial health check</a></div>}<PostList posts={posts} /></section>
+</Base>

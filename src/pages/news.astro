@@ -1,0 +1,8 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import { getCollection } from 'astro:content';
+import { isPublished } from '../lib/publication.js';
+const posts = (await getCollection('blog', ({data}) => isPublished(data) && data.contentType === 'news')).sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<Base title="Economy and policy explainers | The MoneyGoal" description="Understand official financial announcements: what changed, when it takes effect, who is affected and where to read the original documents." noindex={posts.length === 0}><section class="mx-auto max-w-[1100px] px-5 py-14 md:px-10"><p class="mb-4 text-xs uppercase tracking-wider text-green">Official announcements, explained</p><h1 class="mb-5 font-serif text-4xl font-bold">Economy &amp; policy</h1><p class="mb-7 max-w-[700px] text-lg leading-relaxed text-ink3">We explain changes using original regulator, central bank and government releases. Publication dates and effective dates are identified separately. We do not publish trading signals or price predictions.</p><PostList posts={posts} empty="No verified news explainers have been published yet." /><p class="mt-8 text-sm"><a href="/methodology">Read our publishing method</a></p></section></Base>

@@ -1,0 +1,6 @@
+---
+import { postHref, MARKETS } from '../lib/publication.js';
+import { dmyLong } from '../lib/format.js';
+const { posts, empty = 'No articles are published in this section yet. Explore the guides and calculators below.' } = Astro.props;
+---
+{posts.length === 0 ? <p class="py-6 leading-relaxed text-ink3">{empty} <a href="/guides">All guides</a> · <a href="/calculators">Calculators</a></p> : posts.map(post => <a href={postHref(post)} class="block border-b border-rule py-7"><p class="mb-2 text-xs uppercase tracking-wider text-green">{post.data.category} · {MARKETS[post.data.market]} · {dmyLong(post.data.updatedDate ?? post.data.pubDate)}</p><h2 class="mb-2 font-serif text-2xl font-semibold leading-snug">{post.data.title}</h2><p class="max-w-[760px] leading-relaxed text-ink3">{post.data.description}</p></a>)}

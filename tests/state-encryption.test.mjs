@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{encryptState,decryptState,emptyState}from'../scripts/lib/state.mjs';
+test('public ledger blobs reveal no spend or draft metadata',()=>{const s=emptyState();s.monthly.privateCost=321;const key='aa'.repeat(32);const encrypted=encryptState(s,key);assert.ok(!encrypted.includes('privateCost'));assert.deepEqual(decryptState(encrypted,key),s);assert.throws(()=>decryptState(encrypted,'bb'.repeat(32)));});
+test('tampered state is rejected rather than reset to an empty budget',()=>{const key='cc'.repeat(32);const d=JSON.parse(encryptState(emptyState(),key));d.tag='00'.repeat(16);assert.throws(()=>decryptState(JSON.stringify(d),key));});

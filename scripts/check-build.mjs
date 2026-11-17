@@ -67,17 +67,19 @@ for (const file of pages) {
   else if (!is404) {
     const expected = 'https://themoneygoal.com' + route;
     if (canon[1] !== expected) fail.push(`${at}: canonical ${canon[1]} != ${expected}`);
-    if (sitemapUrls.size && !sitemapUrls.has(canon[1]))
+    const noindex = /<meta name="robots" content="noindex/.test(html);
+    if (!noindex && sitemapUrls.size && !sitemapUrls.has(canon[1]))
       fail.push(`${at}: canonical ${canon[1]} is not in the sitemap`);
   }
 
+  if (/CALCULATION_TABLE:/.test(html)) fail.push(`${at}: calculation marker was not rendered`);
   const dead = (html.match(/href="#"/g) ?? []).length;
   if (dead) fail.push(`${at}: ${dead} dead href="#" link(s)`);
 
-  for (const m of html.matchAll(/href="(\/[^"#?]*)"/g)) {
-    const href = m[1].replace(/\/$/, '');
+  for (const m of html.matchAll(/href="(\/[^"]*)"/g)) {
+    const href = m[1].split(/[?#]/)[0].replace(/\/$/, '');
     if (/\.(svg|png|jpe?g|ico|xml|txt|css|js|webmanifest)$/.test(href)) continue;
-    if (!built.has(href) && !existsSync(join(DIST, href.slice(1)))) {
+    if (!built.has(href) && !existsSync(join(DIST, href.slice(1))) && !existsSync(join('functions', href.slice(1) + '.js'))) {
       fail.push(`${at}: internal link ${m[1]} does not exist in the build`);
     }
   }

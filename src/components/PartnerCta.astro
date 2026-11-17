@@ -10,14 +10,19 @@
  * link — the old code popped alert("configuration is pending") on every click.
  */
 import { PARTNER } from '../lib/site.js';
+import { getOffer, offerExitUrl } from '../lib/offers.js';
 
 interface Props {
   heading: string;
   variant?: 'panel' | 'inline';
   class?: string;
+  market?: string;
+  placement?: string;
 }
-const { heading, variant = 'panel', class: className = '' } = Astro.props;
-const url = PARTNER.referralUrl?.trim();
+const { heading, variant = 'panel', class: className = '', market = 'IN', placement = 'partner-panel' } = Astro.props;
+const offer = getOffer('alice-blue', market);
+const page = Astro.url.pathname.replace(/[^a-z0-9-]/gi, '-');
+const url = offer ? offerExitUrl(offer, market, page, placement) : null;
 ---
 
 {
@@ -41,7 +46,7 @@ const url = PARTNER.referralUrl?.trim();
             variant === 'panel' ? 'text-[#C9C2B4]' : 'text-ink3',
           ]}
         >
-          Paid partner link &middot; we receive {PARTNER.compensation}
+          India only &middot; paid partner link &middot; we receive {PARTNER.compensation}
         </span>
       </div>
 
@@ -66,6 +71,7 @@ const url = PARTNER.referralUrl?.trim();
         <div class="flex flex-col items-start gap-3 lg:col-span-5">
           <a
             href={url}
+            data-offer="alice-blue" data-placement={placement} data-market={market}
             target="_blank"
             rel={PARTNER.rel}
             class:list={[

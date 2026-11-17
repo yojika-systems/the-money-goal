@@ -2,10 +2,14 @@
 import Base from '../layouts/Base.astro';
 import PartnerCta from '../components/PartnerCta.astro';
 import Disclosure from '../components/Disclosure.astro';
+import { futureValue, inrCompact } from '../lib/finance.js';
 import { SITE, PARTNER } from '../lib/site.js';
 import { WHAT_THIS_IS, WHAT_IT_ISNT, credentialLine } from '../lib/disclosures.js';
+import { getCollection } from 'astro:content';
+import { isPublished } from '../lib/publication.js';
 import { LANGUAGES } from '../lib/languages.js';
 
+const availableLanguages = new Set((await getCollection('blog', ({data}) => isPublished(data))).map(p => p.data.lang));
 const GUIDES = [
   {
     topic: 'Investing',
@@ -51,7 +55,7 @@ const GUIDES = [
 
 const PROMISES = [
   { title: 'No tips, ever', detail: 'No stock recommendations, no target prices.' },
-  { title: 'No account needed', detail: 'Nothing to sign up for. No data collected.' },
+  { title: 'No account needed', detail: 'No signup. Calculator inputs stay on your device.' },
   { title: 'Assumptions shown', detail: 'Every projection states what it assumed.' },
 ];
 
@@ -185,13 +189,13 @@ const jsonLd = {
       }
       <article class="flex flex-col justify-between bg-tint px-7 pb-8 pt-[30px]">
         <div>
-          <div class="mb-4 text-[11.5px] uppercase tracking-[0.08em] text-muted">Published daily</div>
+          <div class="mb-4 text-[11.5px] uppercase tracking-[0.08em] text-muted">Sourced explainers</div>
           <h3 class="mb-2.5 font-serif text-[22px] font-semibold leading-[1.3]">
-            New explainers, twelve languages
+            One question, clearly explained
           </h3>
           <p class="mb-4.5 text-[14.5px] leading-[1.65] text-ink3">
-            One new guide every day, published in Hindi, Tamil, Telugu, Bengali, Marathi and seven
-            more.
+            Practical guides to saving, debt, investing costs and the economy. Published when
+            the evidence and calculation checks are complete.
           </p>
         </div>
         <a href="/blog" class="mt-4 text-sm font-medium">See the archive &rarr;</a>
@@ -225,10 +229,10 @@ const jsonLd = {
         </div>
         <div class="flex items-baseline justify-between pb-[18px] pt-4">
           <span class="text-sm text-muted">Could become</span>
-          <span class="num font-serif text-[30px] font-bold text-green">&#8377;75.7 L</span>
+          <span class="num font-serif text-[30px] font-bold text-green">{inrCompact(futureValue(15000, 0.12, 15))}</span>
         </div>
         <Disclosure>
-          12% p.a. nominal return, uninterrupted monthly investing, starting from zero. Not a
+          12% p.a. nominal gross return before fees and tax, uninterrupted monthly investing, starting from zero. Not a
           forecast. Real returns vary and can be negative.
         </Disclosure>
       </div>
@@ -250,7 +254,7 @@ const jsonLd = {
       <div class="mb-5 text-[12.5px] uppercase tracking-[0.09em] text-muted">Read in your language</div>
       <div class="flex flex-wrap gap-2.5">
         {
-          LANGUAGES.map((l) => (
+          LANGUAGES.filter(l => availableLanguages.has(l.code)).map((l) => (
             <a
               href={l.code === 'en' ? '/blog' : `/${l.code}/blog`}
               class="border border-rule bg-surface px-4 py-2.5 text-[15px] transition-colors hover:border-ink"
