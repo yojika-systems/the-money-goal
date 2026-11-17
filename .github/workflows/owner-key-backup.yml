@@ -1,0 +1,31 @@
+name: Owner state-key recovery
+on:
+  workflow_dispatch:
+    inputs:
+      owner_public_key:
+        description: RSA public key only (PEM, at least 3072 bits). Never enter a private key.
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Encrypt the key for its owner
+        env:
+          STATE_ENCRYPTION_KEY: ${{ secrets.STATE_ENCRYPTION_KEY }}
+          OWNER_PUBLIC_KEY: ${{ inputs.owner_public_key }}
+        run: node scripts/backup-state-key.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: owner-state-key-backup
+          path: owner-backup/state-key.enc
+          retention-days: 1
