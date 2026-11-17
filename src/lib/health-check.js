@@ -1,8 +1,8 @@
 /* The financial health self-check, carried over verbatim from the pre-Astro
  * financial-health.html — the seven statements and their weights are unchanged.
  *
- * It scores in the browser and stores nothing. That claim is on the page, so it
- * has to stay true: no fetch, no localStorage, no analytics event.
+ * It scores in the browser. Assessment answers and scores must never enter
+ * storage or measurement; the widget may send only its allowlisted completion event.
  */
 export const HEALTH_ITEMS = [
   {
