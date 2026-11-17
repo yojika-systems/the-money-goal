@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import PartnerCta from '../components/PartnerCta.astro';
 import { SITE, OPERATOR, PARTNER, chargesVerified } from '../lib/site.js';
 import { referralDisclosure, GRIEVANCE_PATH, MARKET_RISK } from '../lib/disclosures.js';
+import { getOffer } from '../lib/offers.js';
+const commercialAvailable=Boolean(getOffer('alice-blue','IN'));
 
 /* Rows render "See Alice Blue's charges page" until the real figure is in
  * site.js — a stated number here would be a claim about someone else's pricing. */
@@ -15,17 +17,17 @@ const CHARGES = [
 
 const KYC = [
   { n: 1, title: 'PAN card', detail: 'Must match your name exactly as on the bank account.' },
-  { n: 2, title: 'Aadhaar linked to your mobile', detail: 'The OTP-based e-sign will not work otherwise.' },
+  { n: 2, title: 'Accepted identity and address proofs', detail: 'Check the provider’s document list and verification options for your account type.' },
   { n: 3, title: 'A cancelled cheque or bank statement', detail: 'For the account you will settle funds through.' },
   { n: 4, title: 'A signature on white paper', detail: 'Plus a live selfie for in-person verification.' },
   { n: 5, title: 'Income proof', detail: 'Only if you intend to trade derivatives.' },
 ];
 
 const FACTS = [
-  { t: 'It costs you nothing extra', d: `You pay ${PARTNER.displayName}'s standard published charges whether you come through us or not.` },
-  { t: 'It is ongoing, not one-off', d: 'We receive a share of brokerage on trades, not a single sign-up fee. More trading means more for us.' },
-  { t: 'Which is why we say this', d: 'Frequent trading is how most retail investors lose money. Our incentive and your interest can diverge here.' },
-  { t: 'No content is sponsored', d: `${PARTNER.displayName} does not see, review or pay for anything we publish.` },
+  { t: 'Check your actual plan', d: 'Read the provider’s current pricing and the terms offered to you. We do not quote account-specific charges we have not verified.' },
+  { t: 'Compensation can continue', d: 'A qualifying referral may earn us a share of brokerage, subject to the agreement and provider approval.' },
+  { t: 'There is a conflict of interest', d: 'More trading can increase brokerage costs and our potential compensation. A referral payment is not a reason to trade.' },
+  { t: 'Promotional permission matters', d: 'Paid placements remain unavailable until the applicable provider approval and permitted wording are recorded.' },
 ];
 
 const REGISTRATION = [
@@ -57,9 +59,9 @@ const description = `The MoneyGoal is an authorised person of ${PARTNER.legalNam
           How we earn, and why that should make you read more carefully, not less.
         </h1>
         <p class="mb-5 max-w-[600px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
-          Everything on this site is free. Our only income is {PARTNER.compensation} that{' '}
-          {PARTNER.displayName} earns from people who open an account through our link. You should
-          know that before you read a single word of our guides.
+          Everything on this site is free. Our existing relationship with {PARTNER.displayName}
+          may pay us {PARTNER.compensation} from qualifying referrals. This creates a potential
+          conflict of interest that readers should know about.
         </p>
         <p class="max-w-[600px] text-[17px] leading-[1.72] text-ink3 md:text-[18.5px]">
           <strong class="text-ink">You do not need to open anything to use this site.</strong> No
@@ -117,7 +119,8 @@ const description = `The MoneyGoal is an authorised person of ${PARTNER.legalNam
           RTA platform without any broker at all — and pay no brokerage.
         </p>
         <p class="text-base leading-[1.72] text-ink3 md:text-[16.5px]">
-          You need one to hold shares, ETFs, bonds or sovereign gold bonds in your own name.
+          Demat requirements depend on the instrument and purchase channel. Check those requirements
+          before opening an account; the account itself is not an investment.
         </p>
       </div>
       <div class="border border-rule bg-surface lg:col-span-7">
@@ -127,8 +130,8 @@ const description = `The MoneyGoal is an authorised person of ${PARTNER.legalNam
               You probably need one
             </div>
             <p class="text-[14.5px] leading-[1.72] text-ink3">
-              To buy individual shares or ETFs &middot; to hold sovereign gold bonds &middot; to
-              apply for IPOs &middot; to hold securities in your own name
+              For listed shares and ETFs bought through an Indian broker. Check the specific
+              instrument and account requirements before applying.
             </p>
           </div>
           <div class="border-b border-rule px-7 py-6">
@@ -170,7 +173,7 @@ const description = `The MoneyGoal is an authorised person of ${PARTNER.legalNam
                 <dt class="text-[14.5px] text-ink3">{c.label}</dt>
                 <dd class="num text-right text-[14.5px]">
                   {c.value ?? (
-                    <a href="https://aliceblueonline.com/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://aliceblueonline.com/pricing" target="_blank" rel="noopener noreferrer">
                       See their charges page &rarr;
                     </a>
                   )}
@@ -209,6 +212,7 @@ const description = `The MoneyGoal is an authorised person of ${PARTNER.legalNam
   </section>
 
   <section class="mx-auto max-w-[1440px] px-5 pb-14 md:px-10 lg:px-20">
+    {!commercialAvailable && <p class="mb-5 text-sm leading-relaxed text-ink3">The paid link is currently unavailable while applicable promotional approval is verified. <a href="https://partners.aliceblueonline.com/circular/referral_partner_onboarding_policy.pdf" class="underline" rel="noopener noreferrer" target="_blank">Published partner policy</a>.</p>}
     <PartnerCta heading="If you have read the above and still want to go ahead">
       This opens {PARTNER.displayName}&rsquo;s own eKYC with our partner code attached. Everything
       from that point — your documents, your money, your account — is between you and{' '}

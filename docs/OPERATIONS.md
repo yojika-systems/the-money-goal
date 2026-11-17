@@ -33,6 +33,8 @@ Before a live content commit, the publisher confirms that the only changed file 
 
 Provider maintenance may only suspend an existing registry entry. It cannot change rates, links, dates, countries or activate a campaign. A successful HTTP request is not an agreement review. The live `/api/offer` endpoint checks country, recorded approval and expiration on every click. An expired offer returns 410 even before a rebuild. To reactivate, verify exact terms, record approval, eligibility, approved wording and an expiry. Never use an HTTP-only check to extend permission.
 
+Alice Blue remains held. Its old `/charges/` URL returned 404; the verified current pricing page is `/pricing`. The published referral policy requires approval for promotional material. Confirm the applicable agreement and website permission before activation; required creatives need an approval reference and permitted wording. Keep private approval documents outside this public repository. The existing referral code is retained, with no inferred commission rate or new promotion permission.
+
 ## Measurement and privacy
 
 `wrangler.toml` declares the Analytics Engine dataset `themoneygoal_events` bound as `TMG_METRICS`. `/api/health` reports whether it is bound. `/api/events` accepts a fixed page and event allowlist. It stores event/page/market/tool/offer/placement plus a count. No identity, request headers, IPs, financial inputs or calculation results are written to that dataset. The browser sends optional events only after analytics consent; DNT/GPC override consent. This does not disable Cloudflare's own hosting/security processing. Aggregate endpoint counts are not unique-user counts.
