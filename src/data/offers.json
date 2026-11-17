@@ -16,15 +16,17 @@
     "commission": null,
     "attributionWindow": null,
     "url": "https://ekyc.aliceblueonline.com/?source=SKEL577",
-    "termsUrl": "https://aliceblueonline.com/charges/",
+    "termsUrl": "https://aliceblueonline.com/pricing",
+    "promotionPolicyUrl": "https://partners.aliceblueonline.com/circular/referral_partner_onboarding_policy.pdf",
     "lastVerified": "2026-11-17",
     "reviewDue": "2026-11-24",
     "expiresAt": "2026-11-24T23:59:59+05:30",
-    "approvedWording": "Open an account on Alice Blue’s website",
+    "approvedWording": null,
     "placementTracking": null,
-    "requiresCreativeApproval": false,
-    "creativeApproval": "existing-link-only",
-    "notes": "Automatic hold: source-unavailable. Recheck exact terms and eligibility before reactivation."
+    "requiresCreativeApproval": true,
+    "creativeApproval": "unconfirmed",
+    "creativeApprovalReference": null,
+    "notes": "Existing relationship is owner-confirmed. Published referral policy requires promotion approval; applicable website permission is unverified. The obsolete charges URL was replaced with the current official pricing page on 17 November 2026."
   },
   {
     "id": "cj",

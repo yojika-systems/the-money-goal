@@ -79,7 +79,7 @@ const url = offer ? offerExitUrl(offer, market, page, placement) : null;
               variant === 'panel' ? 'bg-green-bright text-ink' : 'bg-green text-paper',
             ]}
           >
-            Open an account on {PARTNER.displayName}&rsquo;s website &rarr;
+            {offer?.approvedWording ?? `Open an account on ${PARTNER.displayName}’s website`} &rarr;
           </a>
           <span
             class:list={[
