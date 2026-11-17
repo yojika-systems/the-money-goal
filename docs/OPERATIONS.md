@@ -8,16 +8,20 @@ Run `npm ci`, `npm test`, and `npm run verify`. The build includes placeholder, 
 
 ## GitHub configuration
 
-Two repository secrets are required for generation:
+The default provider is `codex`, using the owner's ChatGPT/Codex subscription and available Codex credits, matching the existing Yojika approach. An OpenAI API balance is not required. Set `AI_PROVIDER=codex`; there is no automatic API fallback.
 
-- `OPENAI_API_KEY`: restricted to Responses API write. Created on 17 November 2026; expires 15 February 2027. Do not place it in a file, workflow, log or issue.
+- `CODEX_CONTENT_AUTH_JSON`: a dedicated ChatGPT-managed Codex login, created in a fresh temporary `CODEX_HOME`. Do not copy the everyday app login or Yojika's independently rotating login. Only a trusted serialized main-branch workflow may use it.
 - `STATE_ENCRYPTION_KEY`: 32 random bytes as hex. AES-256-GCM protects the durable ledger on the public `automation-state` branch. Preserve this key; if it is lost, do not silently reset the budget ledger. Pause generation and reconstruct spend first.
+
+The Codex secret seeds the first run. Each call checkpoints the refreshed auth into the encrypted ledger, including on a failed draft, so the next serialized call/run uses the latest token. It is never written to plaintext run artifacts. The CLI and model process receive no GitHub, encryption, Google, CJ or API secrets. Before inference a real sandbox preflight must demonstrate that both the credential directory and repository Git configuration are unreadable. The agent only gets an evidence scratch directory, no network tools or write permissions, and returns schema-bound JSON. Temporary auth and scratch files are removed in a finally block. The workflow pins Codex CLI 0.163.0.
+
+Optional `AI_PROVIDER=openai-api` requires `OPENAI_API_KEY` restricted to Responses API write, plus an API balance. The previously prepared API key is not used by the Codex provider. Do not switch providers automatically after a partial failure.
 
 Run artifacts are encrypted with the same key before upload because this repository is public. Downloaded files can be opened with `STATE_ENCRYPTION_KEY` in the environment and `node scripts/read-artifact.mjs path/to/report.json.enc`. Never upload plaintext owner reports.
 
 The workflow runs at 03:17 and 15:17 UTC (08:47 and 20:47 India time) with a concurrency lock. A manual run is available in Actions → MoneyGoal publication. Missing credentials or source evidence produce a held summary with no paid request or publication. There is no fallback to another model, credential or subscription.
 
-`automation/config.json` is the kill switch and cost policy. AI requests reserve conservative token cost in encrypted state BEFORE sending. Uncertain failures retain their reservation. The AI ceiling is ₹7,000/month with ₹18,000 reserved for other operations under the ₹25,000 planning cap; outside vendor spending must still be reconciled. The budget FX rate is deliberately conservative and is not a live exchange quote. Pricing has a review deadline. Do not change models without verifying rates and support.
+`GENERATION_PAUSED=true` in repository Actions variables immediately holds drafting while maintenance continues. `automation/config.json` also supplies a kill switch and usage policy. Codex reserves each attempted call before execution, with at most four calls per day and 100 per month, a three-minute timeout per call and no automatic purchases or provider fallback. These are usage limits, not a rupee cost guarantee: subscription/credit charges are not inferred from API token prices. Reconcile shared account usage and operating spend with actual billing. The optional API route retains the ₹7,000 monthly AI ceiling, conservative token reservations and ₹18,000 non-AI reserve under the ₹25,000 planning cap. Outside vendor spending must still be reconciled. Review the pinned model and cost policy by the recorded deadline.
 
 Seven separate successful shadow days, including a real build of each draft, are required before automatic publication. The workflow never pushes a shadow article. The initial guides shipped with implementation are not counted as shadow days. Weekly ceilings are four evergreen, two news, two source refreshes. A missing source or editorial research flag holds a backlog candidate. Null volume and position mean unknown.
 

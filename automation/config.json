@@ -1,5 +1,14 @@
 {
   "enabled": true,
+  "provider": "codex",
+  "subscription": {
+    "model": "gpt-6.1-sol",
+    "cliVersion": "0.163.0",
+    "maxCallsPerDay": 4,
+    "maxCallsPerMonth": 100,
+    "timeoutMs": 180000,
+    "reviewDue": "2026-12-17"
+  },
   "mode": "shadow-then-live",
   "shadowDays": 7,
   "maxCandidatesPerRun": 2,
