@@ -2,6 +2,7 @@ import { mkdtempSync,readFileSync,writeFileSync,rmSync,existsSync,chmodSync } fr
 import { tmpdir } from 'node:os';
 import { join,resolve } from 'node:path';
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 export function validCodexAuth(value,expectedEmail){
  if(!value||value.auth_mode!=='chatgpt'||!value.tokens?.refresh_token||!value.tokens?.access_token)throw new Error('A dedicated ChatGPT-managed Codex login is required');
  if(expectedEmail){let email;try{email=JSON.parse(Buffer.from(value.tokens.id_token.split('.')[1],'base64url').toString()).email;}catch{}if(email?.toLowerCase()!==expectedEmail.toLowerCase())throw new Error('Codex login belongs to a different account; generation held');}
@@ -12,6 +13,10 @@ export function reserveCodexCall(state,config,now=new Date()){
  const record=usage[month]??={calls:0,days:{},inputTokens:0,outputTokens:0,billing:'ChatGPT plan or Codex credits; monetary cost unavailable'};
  if(record.calls>=config.subscription.maxCallsPerMonth||(record.days[day]??0)>=config.subscription.maxCallsPerDay)throw new Error('Codex subscription call allowance reached');
  record.calls++;record.days[day]=(record.days[day]??0)+1;return record;
+}
+export function selectCodexAuth(state,seed,expectedEmail){
+ if(seed){const fingerprint=createHash('sha256').update(seed).digest('hex');if(state.codexSeedFingerprint!==fingerprint){state.codexAuth=validCodexAuth(JSON.parse(seed),expectedEmail);state.codexSeedFingerprint=fingerprint;}}
+ return validCodexAuth(state.codexAuth,expectedEmail);
 }
 export function codexChildEnvironment(authHome,workdir){
  // Never pass GitHub, state-encryption, API, Google or CJ credentials to the model process.
@@ -37,7 +42,7 @@ export async function codexStructuredCall({instructions,input,schema,store,confi
  if(JSON.stringify(input).length>config.maxInputCharacters)throw new Error('Evidence packet exceeds input limit');
  if(new Date(config.subscription.reviewDue)<now)throw new Error('Codex usage policy is due for review');
  // Refresh state is encrypted in the existing durable ledger; the secret is a one-time seed.
- const auth=validCodexAuth(store.state.codexAuth??JSON.parse(process.env.CODEX_CONTENT_AUTH_JSON??'null'),config.subscription.accountEmail);
+ const auth=selectCodexAuth(store.state,process.env.CODEX_CONTENT_AUTH_JSON,config.subscription.accountEmail);
  const record=reserveCodexCall(store.state,config,now);await store.save(store.state);
  const authHome=mkdtempSync(join(tmpdir(),'tmg-codex-auth-'));const workdir=mkdtempSync(join(tmpdir(),'tmg-evidence-'));
  chmodSync(authHome,0o700);chmodSync(workdir,0o700);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { writeFileSync,readFileSync,existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth } from '../scripts/lib/codex.mjs';
+import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth,selectCodexAuth } from '../scripts/lib/codex.mjs';
 const config={maxInputCharacters:48000,subscription:{model:'gpt-6.1-sol',maxCallsPerDay:4,maxCallsPerMonth:100,timeoutMs:1000,reviewDue:'2026-12-17'}};
 const now=new Date('2026-11-17T10:00:00Z');
 const fakeAuth={auth_mode:'chatgpt',tokens:{refresh_token:'test-only-refresh',access_token:'test-only-access'}};
@@ -21,6 +21,12 @@ test('Codex refuses API credentials and any plaintext ledger',async()=>{
 test('a seed from a different ChatGPT account cannot be used',()=>{
  const payload=Buffer.from(JSON.stringify({email:'different@example.invalid'})).toString('base64url');
  assert.throws(()=>validCodexAuth({...fakeAuth,tokens:{...fakeAuth.tokens,id_token:`header.${payload}.signature`}},'sathya@tastesy.in'),/different account/);
+});
+test('queued seeds cannot overwrite rotated auth, while an owner-replaced seed reauthorizes',()=>{
+ const state={};const seed=JSON.stringify(fakeAuth);selectCodexAuth(state,seed);state.codexAuth.tokens.refresh_token='test-only-rotated';
+ assert.equal(selectCodexAuth(state,seed).tokens.refresh_token,'test-only-rotated');
+ const replacement=JSON.stringify({...fakeAuth,tokens:{...fakeAuth.tokens,refresh_token:'test-only-new-login'}});
+ assert.equal(selectCodexAuth(state,replacement).tokens.refresh_token,'test-only-new-login');
 });
 test('refreshed login survives a failed call and temporary credentials are removed',async()=>{
  process.env.CODEX_RUNTIME_ROOT='/tmp/test-runtime';const store={encrypted:true,state:{codexAuth:fakeAuth},save:async()=>{}};let authHome;
