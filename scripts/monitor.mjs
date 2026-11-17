@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { deploymentDecision } from './lib/releases.mjs';
+import { deploymentDecision,guardedRollback } from './lib/releases.mjs';
 import { stateStore } from './lib/state.mjs';
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const store=await stateStore();const release=store.state.pendingPublication;
@@ -27,7 +27,6 @@ if(verified){
 }
 // A timeout may be a delayed deployment. Leave it pending for next run, never undo it blindly.
 if(!failure)throw new Error('Deployment or live digest is not confirmed; publication remains locked for next-run recovery');
-git('fetch','origin','main');head=git('rev-parse','origin/main');if(head!==release.sha)throw new Error('Deployment failed but main has newer work; rollback held to preserve it');
-git('checkout','--detach','origin/main');git('config','user.name','MoneyGoal publisher');git('config','user.email','publisher@users.noreply.github.com');git('revert','--no-edit',release.sha);const rollback=git('rev-parse','HEAD');git('push','origin',`${rollback}:refs/heads/main`);
+const rollback=guardedRollback(release.sha,git);
 store.state.published.push({...release,status:'rolled-back',rollback});store.state.seen[release.id]={status:'held',reason:'Deployment failed and was reverted',attemptedAt:new Date().toISOString()};store.state.pendingPublication=null;await store.save(store.state);
 throw new Error(`Failed deployment reverted by ${rollback}; inspect the hosting check before republishing`);

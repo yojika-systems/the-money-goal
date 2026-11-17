@@ -31,8 +31,11 @@ try{
  report.dueReviews=due.map(p=>({key:p.data.translationKey,market:p.data.market}));
  if(state.pendingPublication)throw new Error('A previous publication needs deployment recovery before drafting');
  if(!config.enabled)throw new Error('Generation kill switch is off');
+ if(process.env.GENERATION_PAUSED==='true')throw new Error('Generation is paused by the repository variable; maintenance continues without model calls');
  if(offline)throw new Error('Offline dry run: no model calls or publication');
- if(!process.env.OPENAI_API_KEY)throw new Error('OPENAI_API_KEY is not configured; no paid requests made');
+ const provider=process.env.AI_PROVIDER??config.provider;
+ if(provider==='codex'&&!state.codexAuth&&!process.env.CODEX_CONTENT_AUTH_JSON)throw new Error('Dedicated Codex subscription login is not configured; generation held');
+ if(provider==='openai-api'&&!process.env.OPENAI_API_KEY)throw new Error('OPENAI_API_KEY is not configured; no paid requests made');
  const refreshes=due.map(p=>({id:p.data.translationKey,title:p.data.title,topic:p.data.topic,market:p.data.market,contentType:p.data.contentType,refresh:true,file:p.file,original:p.data,sources:p.data.sources.map(s=>s.url),calculationRefs:p.data.calculationRefs,readerDecision:'Recheck the existing explanation against current primary documents and preserve its reader decision'}));
  const candidates=[...refreshes,...news,...backlog.filter(c=>['editorial','validated'].includes(c.research?.status))];
  const publicationToday=state.published.some(p=>p.date===day&&p.status==='published');

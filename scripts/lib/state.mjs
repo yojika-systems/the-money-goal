@@ -12,10 +12,10 @@ export async function stateStore({token=process.env.GITHUB_TOKEN,repo=process.en
  };
  if(token&&repo){
   const encryptionKey=process.env.STATE_ENCRYPTION_KEY;if(!encryptionKey)throw new Error('STATE_ENCRYPTION_KEY is not configured');
-  try{const file=await request(`/contents/state.enc?ref=${branch}`);sha=file.sha;return {state:decryptState(Buffer.from(file.content,'base64').toString(),encryptionKey),save:async state=>{const next=await request('/contents/state.enc','PUT',{message:'[skip ci] [CF-Pages-Skip] Publication state checkpoint',content:Buffer.from(encryptState(state,encryptionKey)).toString('base64'),branch,sha});sha=next.content.sha;}};}
+  try{const file=await request(`/contents/state.enc?ref=${branch}`);sha=file.sha;return {encrypted:true,state:decryptState(Buffer.from(file.content,'base64').toString(),encryptionKey),save:async state=>{const next=await request('/contents/state.enc','PUT',{message:'[skip ci] [CF-Pages-Skip] Publication state checkpoint',content:Buffer.from(encryptState(state,encryptionKey)).toString('base64'),branch,sha});sha=next.content.sha;}};}
   catch(error){if(error.status!==404)throw error;}
   try{await request(`/git/ref/heads/${branch}`);}catch(error){if(error.status!==404)throw error;const main=await request('/git/ref/heads/main');try{await request('/git/refs','POST',{ref:`refs/heads/${branch}`,sha:main.object.sha});}catch(e){if(e.status!==422)throw e;}}
-  return {state:emptyState(),save:async state=>{const next=await request('/contents/state.enc','PUT',{message:'[skip ci] [CF-Pages-Skip] Publication state checkpoint',content:Buffer.from(encryptState(state,encryptionKey)).toString('base64'),branch,...(sha?{sha}:{})});sha=next.content.sha;}};
+  return {encrypted:true,state:emptyState(),save:async state=>{const next=await request('/contents/state.enc','PUT',{message:'[skip ci] [CF-Pages-Skip] Publication state checkpoint',content:Buffer.from(encryptState(state,encryptionKey)).toString('base64'),branch,...(sha?{sha}:{})});sha=next.content.sha;}};
  }
  mkdirSync(dirname(localPath),{recursive:true});
  return {state:existsSync(localPath)?JSON.parse(readFileSync(localPath,'utf8')):emptyState(),save:async state=>writeFileSync(localPath,JSON.stringify(state,null,2))};

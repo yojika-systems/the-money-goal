@@ -1,10 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { reserveCost, settleCost } from './state.mjs';
+import { codexStructuredCall } from './codex.mjs';
 const object=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const string={type:'string'};const strings={type:'array',items:string};
 export const draftSchema=object({title:string,description:string,sections:{type:'array',items:object({heading:string,paragraphs:{type:'array',items:object({text:string,evidenceIds:strings})}})},evidence:{type:'array',items:object({id:string,claim:string,sourceId:string,excerpt:string})}});
 export const verificationSchema=object({supported:{type:'boolean'},allMaterialClaimsCovered:{type:'boolean'},countryConsistent:{type:'boolean'},originalContribution:{type:'boolean'},personalisedAdvice:{type:'boolean'},inventedExperience:{type:'boolean'},conflicts:strings,unsupportedClaims:strings,effectiveDate:{type:['string','null']},summary:string});
-export async function structuredCall({instructions,input,schema,name,store,config,key=process.env.OPENAI_API_KEY,fetcher=fetch,now=new Date()}) {
+export async function structuredCall(args) {
+ const provider=process.env.AI_PROVIDER??args.config.provider;
+ if(provider==='codex')return codexStructuredCall(args);
+ if(provider!=='openai-api')throw new Error('Select codex or openai-api explicitly; no provider fallback is allowed');
+ return apiStructuredCall(args);
+}
+export async function apiStructuredCall({instructions,input,schema,name,store,config,key=process.env.OPENAI_API_KEY,fetcher=fetch,now=new Date()}) {
  if(!key)throw new Error('OPENAI_API_KEY is not configured');
  if(new Date(config.pricing.reviewDue)<now)throw new Error('Model pricing is due for verification');
  const serialized=JSON.stringify(input);
