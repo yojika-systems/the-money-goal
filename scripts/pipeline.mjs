@@ -6,6 +6,8 @@ import { fetchAllowed,collectDocument,parseFeed } from './lib/network.mjs';
 import { stateStore,underWeeklyLimit,shadowReady,hasPublishedArticleToday } from './lib/state.mjs';
 import { structuredCall,draftSchema,verificationSchema,writerInstructions,verifierInstructions } from './lib/model.mjs';
 import { assembleDraft,assertVerified } from './lib/drafting.mjs';
+import { evidenceOptions,candidateQueue } from './lib/editorial.mjs';
+import { hasCodexCapacity } from './lib/codex.mjs';
 const config=JSON.parse(readFileSync('automation/config.json','utf8'));
 const sources=JSON.parse(readFileSync('automation/sources.json','utf8'));
 const backlog=JSON.parse(readFileSync('automation/backlog.json','utf8'));
@@ -37,7 +39,7 @@ try{
  if(provider==='codex'&&!state.codexAuth&&!process.env.CODEX_CONTENT_AUTH_JSON)throw new Error('Dedicated Codex subscription login is not configured; generation held');
  if(provider==='openai-api'&&!process.env.OPENAI_API_KEY)throw new Error('OPENAI_API_KEY is not configured; no paid requests made');
  const refreshes=due.map(p=>({id:p.data.translationKey,title:p.data.title,topic:p.data.topic,market:p.data.market,contentType:p.data.contentType,refresh:true,file:p.file,original:p.data,sources:p.data.sources.map(s=>s.url),calculationRefs:p.data.calculationRefs,readerDecision:'Recheck the existing explanation against current primary documents and preserve its reader decision'}));
- const candidates=[...refreshes,...news,...backlog.filter(c=>['editorial','validated'].includes(c.research?.status))];
+ const candidates=candidateQueue(refreshes,backlog.filter(c=>['editorial','validated'].includes(c.research?.status)),news);
  const publicationToday=hasPublishedArticleToday(state,day);
  if(publicationToday)throw new Error('Daily publication already completed');
  for(const candidate of candidates){
@@ -45,6 +47,7 @@ try{
   if((!candidate.refresh&&(existingKeys.has(`${candidate.market}:${candidate.id}`)||existingTitles.has(normalize(candidate.title))||state.seen[candidate.id]?.status==='published'))||config.pausedTopics.includes(candidate.topic)||!config.autoPublishMarkets.includes(candidate.market)||!underWeeklyLimit(state,config,candidate.refresh?'refresh':candidate.contentType,now))continue;
   const previous=state.seen[candidate.id];
   if(previous?.attemptedAt?.slice(0,10)===day)continue;
+  if(provider==='codex'&&!hasCodexCapacity(state,config,2,now)){hold('run','Codex allowance must have room for both drafting and independent verification');break;}
   try{
    state.seen[candidate.id]={status:'attempting',attemptedAt:now.toISOString()};await store.save(state);
    if(!candidate.sources?.length)throw new Error('No approved exact source documents');
@@ -53,10 +56,12 @@ try{
    // Source fingerprints also prevent the same release producing a second article.
    const signature=fingerprint(documents.map(d=>d.fingerprint).sort().join(':')+candidate.readerDecision);
    if(!candidate.refresh&&state.published.some(p=>p.signature===signature))throw new Error('Duplicate source and reader-decision fingerprint');
-   const packet={candidate,documents:documents.map(d=>({...d,text:d.text.slice(0,12000)})),existingPages:corpus.map(p=>({title:p.data.title,key:p.data.translationKey,market:p.data.market})),registeredCalculations:candidate.calculationRefs};
+   const promptDocuments=documents.map(d=>({...d,text:d.text.slice(0,Math.min(12000,Math.floor(24000/documents.length)))}));
+   const options=evidenceOptions(promptDocuments,candidate);
+   const packet={candidate,documents:promptDocuments,evidenceOptions:options,existingPages:corpus.map(p=>({title:p.data.title,key:p.data.translationKey,market:p.data.market})),registeredCalculations:candidate.calculationRefs};
    const draft=await structuredCall({instructions:writerInstructions,input:packet,schema:draftSchema,name:'financial_explainer',store,config});
-   const pending=assembleDraft(draft,candidate,documents,String(runId),now);
-   const verdict=await structuredCall({instructions:verifierInstructions,input:{candidate,article:{data:pending.data,body:pending.body},documents:documents.map(d=>({...d,text:d.text.slice(0,12000)}))},schema:verificationSchema,name:'source_verification',store,config});
+   const pending=assembleDraft(draft,candidate,documents,String(runId),now,options);
+   const verdict=await structuredCall({instructions:verifierInstructions,input:{candidate,article:{data:pending.data,body:pending.body},documents:promptDocuments},schema:verificationSchema,name:'source_verification',store,config});
    assertVerified(verdict);
    if(verdict.effectiveDate){if(!Number.isFinite(Date.parse(verdict.effectiveDate)))throw new Error('Unparseable effective date');const target=new Date(verdict.effectiveDate);const variants=[verdict.effectiveDate,target.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}),target.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})].map(v=>normalize(v).replace(/[,]/g,''));if(!documents.some(d=>variants.some(v=>normalize(d.text).replace(/[,]/g,'').includes(v))))throw new Error('Effective date needs explicit source normalization');pending.data.sources[0].effective=verdict.effectiveDate;}
    if(candidate.refresh){pending.data.pubDate=candidate.original.pubDate;pending.data.updatedDate=day;pending.data.legacyUrl=candidate.original.legacyUrl??false;}

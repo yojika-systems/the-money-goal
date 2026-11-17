@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { writeFileSync,readFileSync,existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth,selectCodexAuth,codexFailureCategory } from '../scripts/lib/codex.mjs';
+import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth,selectCodexAuth,codexFailureCategory,hasCodexCapacity } from '../scripts/lib/codex.mjs';
 const config={maxInputCharacters:48000,subscription:{model:'gpt-6.1-sol',maxCallsPerDay:4,maxCallsPerMonth:100,timeoutMs:1000,reviewDue:'2026-12-17'}};
 const now=new Date('2026-11-17T10:00:00Z');
 const fakeAuth={auth_mode:'chatgpt',tokens:{refresh_token:'test-only-refresh',access_token:'test-only-access'}};
@@ -11,6 +11,7 @@ test('subscription allowances reserve failed attempts and stop at daily/monthly 
  const state={};for(let i=0;i<4;i++)reserveCodexCall(state,config,now);assert.throws(()=>reserveCodexCall(state,config,now));
  state.subscriptionUsage['2026-11'].calls=100;assert.throws(()=>reserveCodexCall(state,config,new Date('2026-11-18T10:00:00Z')));
 });
+test('drafting does not spend the last call when verification cannot fit',()=>{const state={};assert.equal(hasCodexCapacity(state,config,2,now),true);for(let i=0;i<3;i++)reserveCodexCall(state,config,now);assert.equal(hasCodexCapacity(state,config,2,now),false);assert.equal(hasCodexCapacity(state,config,1,now),true);});
 test('the model child cannot inherit publishing or encryption secrets',()=>{
  process.env.GITHUB_TOKEN='test-only';process.env.STATE_ENCRYPTION_KEY='test-only';process.env.OPENAI_API_KEY='test-only';
  const env=codexChildEnvironment('/tmp/auth','/tmp/evidence');for(const key of ['GITHUB_TOKEN','STATE_ENCRYPTION_KEY','OPENAI_API_KEY','CJ_API_TOKEN','CODEX_CONTENT_AUTH_JSON'])assert.equal(env[key],undefined);

@@ -27,7 +27,7 @@ Seven separate successful shadow days, including a real build of each draft, are
 
 ## Publication and recovery
 
-Model output is structured plain text, not commands, MDX or arbitrary HTML. Only allowlisted exact source hosts are fetched. Each paragraph has evidence references; evidence passages must occur in fetched documents, and numerical claims must occur in the cited passage. Tables use registered code. A separate model challenge must pass alongside deterministic checks.
+Model output is structured plain text, not commands, MDX or arbitrary HTML. Only allowlisted exact source hosts are fetched. Code extracts bounded literal passage options before drafting; the writer selects passage IDs and cannot supply its own quotation. Each paragraph has evidence references; evidence passages must occur in fetched documents, and numerical claims must occur in the cited passage. Tables use registered code. A separate model challenge must pass alongside deterministic checks. The candidate queue alternates researched evergreen pages and news, with due refreshes included; an unbounded news feed cannot consume every attempt. A new draft needs room for both writer and verifier calls in the subscription allowance.
 
 Before a live content commit, the publisher confirms that the only changed file is the selected Markdown article and main has not moved. It records a pending release in encrypted state and pushes the exact tested commit. The monitor requires a successful Cloudflare check and a matching rendered content digest. A failed deployment is reverted only if main still points to that release. Timeouts and newer commits stay locked for recovery; they are not blindly reverted. The next run recovers the pending release before any new draft.
 
