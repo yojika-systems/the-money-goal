@@ -7,22 +7,22 @@
 #
 # script-src keeps 'unsafe-inline' because Astro 4 inlines small component
 # scripts as <script type="module"> and offers no nonce or hash pipeline. The
-# widgets are bundled (no define:vars, no is:inline), so nothing is loaded from
-# a third-party origin — 'self' covers everything that is external.
+# widgets are bundled. The Google tag origin is allowed for optional analytics;
+# the consent controller loads it only after an affirmative choice.
 #
 # style-src needs 'unsafe-inline' for the inline style attributes the widgets
 # write (progress bars set style.width) and for Astro's inlined stylesheets.
 #
 # fonts.googleapis.com / fonts.gstatic.com carry Source Serif 4 and IBM Plex
 # Sans. img-src stays 'self' data: — there are no third-party images at all now.
-# connect-src 'self' because the site makes zero network calls at runtime; the
-# calculators run entirely in the browser, which is a claim the pages make.
+# Only the first-party aggregate endpoint and Google Analytics collection hosts
+# are allowed. Financial inputs stay in the browser and never enter events.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://region1.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com; upgrade-insecure-requests
 
 # Content-hashed build assets are immutable.
 /_astro/*
