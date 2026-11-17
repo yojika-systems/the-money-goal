@@ -1,9 +1,124 @@
 [
-  { "id": "alice-blue", "name": "Alice Blue", "network": "direct", "status": "active", "approval": "existing-owner-confirmed", "markets": ["IN"], "channels": ["website"], "conversionEvent": "account opened and brokerage earned", "compensation": "a share of brokerage", "commission": null, "attributionWindow": null, "url": "https://ekyc.aliceblueonline.com/?source=SKEL577", "termsUrl": "https://aliceblueonline.com/charges/", "lastVerified": "2026-11-17", "reviewDue": "2026-11-24", "expiresAt": "2026-11-24T23:59:59+05:30", "approvedWording": "Open an account on Alice Blue’s website", "placementTracking": null, "requiresCreativeApproval": false, "creativeApproval": "existing-link-only", "notes": "Existing owner-confirmed relationship. Existing link only; no new charges or promotional claims until agreement review." },
-  { "id": "cj", "name": "CJ advertiser catalogue", "network": "CJ", "status": "candidate", "approval": "unconfirmed", "markets": ["IN", "US"], "channels": ["website"], "url": null, "termsUrl": "https://developers.cj.com/", "notes": "Account exists; individual advertiser relationships must be imported and verified." },
-  { "id": "tradingview", "name": "TradingView", "network": "direct", "status": "candidate", "approval": "unconfirmed", "markets": ["IN", "US"], "channels": ["website"], "url": null, "termsUrl": "https://www.tradingview.com/partner-rules/" },
-  { "id": "wise", "name": "Wise", "network": "Partnerize", "status": "candidate", "approval": "unconfirmed", "markets": ["IN", "US"], "channels": ["website"], "url": null, "termsUrl": "https://wise.com/gb/affiliate-program/" },
-  { "id": "ynab", "name": "YNAB", "network": "invite-only", "status": "candidate", "approval": "unconfirmed", "markets": ["US"], "channels": ["website"], "url": null, "termsUrl": "https://www.ynab.com/press" },
-  { "id": "cuelinks", "name": "Cuelinks card campaigns", "network": "Cuelinks", "status": "candidate", "approval": "unconfirmed", "markets": ["IN"], "channels": ["website"], "url": null, "termsUrl": "https://www.cuelinks.com/terms.md", "requiresCreativeApproval": true },
-  { "id": "coinbase", "name": "Coinbase", "network": "Impact", "status": "deferred", "approval": "unconfirmed", "markets": ["US"], "channels": ["website"], "url": null, "termsUrl": "https://www.coinbase.com/affiliates" }
+  {
+    "id": "alice-blue",
+    "name": "Alice Blue",
+    "network": "direct",
+    "status": "suspended",
+    "approval": "existing-owner-confirmed",
+    "markets": [
+      "IN"
+    ],
+    "channels": [
+      "website"
+    ],
+    "conversionEvent": "account opened and brokerage earned",
+    "compensation": "a share of brokerage",
+    "commission": null,
+    "attributionWindow": null,
+    "url": "https://ekyc.aliceblueonline.com/?source=SKEL577",
+    "termsUrl": "https://aliceblueonline.com/charges/",
+    "lastVerified": "2026-11-17",
+    "reviewDue": "2026-11-24",
+    "expiresAt": "2026-11-24T23:59:59+05:30",
+    "approvedWording": "Open an account on Alice Blue’s website",
+    "placementTracking": null,
+    "requiresCreativeApproval": false,
+    "creativeApproval": "existing-link-only",
+    "notes": "Automatic hold: source-unavailable. Recheck exact terms and eligibility before reactivation."
+  },
+  {
+    "id": "cj",
+    "name": "CJ advertiser catalogue",
+    "network": "CJ",
+    "status": "candidate",
+    "approval": "unconfirmed",
+    "markets": [
+      "IN",
+      "US"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://developers.cj.com/",
+    "notes": "Account exists; individual advertiser relationships must be imported and verified."
+  },
+  {
+    "id": "tradingview",
+    "name": "TradingView",
+    "network": "direct",
+    "status": "candidate",
+    "approval": "unconfirmed",
+    "markets": [
+      "IN",
+      "US"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://www.tradingview.com/partner-rules/"
+  },
+  {
+    "id": "wise",
+    "name": "Wise",
+    "network": "Partnerize",
+    "status": "candidate",
+    "approval": "unconfirmed",
+    "markets": [
+      "IN",
+      "US"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://wise.com/gb/affiliate-program/"
+  },
+  {
+    "id": "ynab",
+    "name": "YNAB",
+    "network": "invite-only",
+    "status": "candidate",
+    "approval": "unconfirmed",
+    "markets": [
+      "US"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://www.ynab.com/press"
+  },
+  {
+    "id": "cuelinks",
+    "name": "Cuelinks card campaigns",
+    "network": "Cuelinks",
+    "status": "candidate",
+    "approval": "unconfirmed",
+    "markets": [
+      "IN"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://www.cuelinks.com/terms.md",
+    "requiresCreativeApproval": true
+  },
+  {
+    "id": "coinbase",
+    "name": "Coinbase",
+    "network": "Impact",
+    "status": "deferred",
+    "approval": "unconfirmed",
+    "markets": [
+      "US"
+    ],
+    "channels": [
+      "website"
+    ],
+    "url": null,
+    "termsUrl": "https://www.coinbase.com/affiliates"
+  }
 ]
