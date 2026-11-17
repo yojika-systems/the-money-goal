@@ -28,5 +28,6 @@ export function reserveCost(state,config,id,maxInr,now=new Date()){
 }
 export function settleCost(state,month,id,actual){const record=state.monthly[month];const reserved=record.reservations[id];if(!Number.isFinite(reserved))throw new Error('Reservation missing');if(!Number.isFinite(actual)||actual<0)throw new Error('Invalid cost');record.spentInr+=actual;delete record.reservations[id];}
 export function shadowReady(state,config){return new Set(state.shadowDays).size>=config.shadowDays;}
+export function hasPublishedArticleToday(state,day){return state.published.some(p=>p.date===day&&p.status==='published'&&p.kind!=='maintenance');}
 export function weekKey(date=new Date()){const d=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));const year=new Date(Date.UTC(d.getUTCFullYear(),0,1));return `${d.getUTCFullYear()}-W${Math.ceil((((d-year)/86400000)+1)/7)}`;}
 export function underWeeklyLimit(state,config,kind,now=new Date()){return state.published.filter(p=>p.week===weekKey(now)&&p.kind===kind&&p.status!=='rolled-back').length<(config.weeklyLimits[kind]??0);}

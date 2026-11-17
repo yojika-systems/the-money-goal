@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { writeFileSync,readFileSync,existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth,selectCodexAuth } from '../scripts/lib/codex.mjs';
+import { reserveCodexCall,codexChildEnvironment,codexStructuredCall,validCodexAuth,selectCodexAuth,codexFailureCategory } from '../scripts/lib/codex.mjs';
 const config={maxInputCharacters:48000,subscription:{model:'gpt-6.1-sol',maxCallsPerDay:4,maxCallsPerMonth:100,timeoutMs:1000,reviewDue:'2026-12-17'}};
 const now=new Date('2026-11-17T10:00:00Z');
 const fakeAuth={auth_mode:'chatgpt',tokens:{refresh_token:'test-only-refresh',access_token:'test-only-access'}};
+test('public failure reasons expose a category rather than credential-bearing CLI text',()=>{assert.equal(codexFailureCategory('401 unauthorized test-only-secret'),'authentication');assert.equal(codexFailureCategory('usage limit reached'),'account-allowance');assert.equal(codexFailureCategory('bwrap namespace failed'),'sandbox');assert.equal(codexFailureCategory('unrecognized field'),'configuration');});
 test('subscription allowances reserve failed attempts and stop at daily/monthly caps',()=>{
  const state={};for(let i=0;i<4;i++)reserveCodexCall(state,config,now);assert.throws(()=>reserveCodexCall(state,config,now));
  state.subscriptionUsage['2026-11'].calls=100;assert.throws(()=>reserveCodexCall(state,config,new Date('2026-11-18T10:00:00Z')));
