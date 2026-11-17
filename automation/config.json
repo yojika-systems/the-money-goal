@@ -2,6 +2,7 @@
   "enabled": true,
   "provider": "codex",
   "subscription": {
+    "accountEmail": "sathya@tastesy.in",
     "model": "gpt-6.1-sol",
     "cliVersion": "0.163.0",
     "maxCallsPerDay": 4,

@@ -2,8 +2,9 @@ import { mkdtempSync,readFileSync,writeFileSync,rmSync,existsSync,chmodSync } fr
 import { tmpdir } from 'node:os';
 import { join,resolve } from 'node:path';
 import { spawn } from 'node:child_process';
-export function validCodexAuth(value){
+export function validCodexAuth(value,expectedEmail){
  if(!value||value.auth_mode!=='chatgpt'||!value.tokens?.refresh_token||!value.tokens?.access_token)throw new Error('A dedicated ChatGPT-managed Codex login is required');
+ if(expectedEmail){let email;try{email=JSON.parse(Buffer.from(value.tokens.id_token.split('.')[1],'base64url').toString()).email;}catch{}if(email?.toLowerCase()!==expectedEmail.toLowerCase())throw new Error('Codex login belongs to a different account; generation held');}
  return value;
 }
 export function reserveCodexCall(state,config,now=new Date()){
@@ -17,7 +18,7 @@ export function codexChildEnvironment(authHome,workdir){
  return {PATH:process.env.PATH,HOME:workdir,TMPDIR:workdir,LANG:'C.UTF-8',CODEX_HOME:authHome};
 }
 export function codexPermissionConfig(authHome,runtimeRoot){
- return `cli_auth_credentials_store = "file"\nforced_login_method = "chatgpt"\ndefault_permissions = "moneygoal-isolated"\n\n[permissions.moneygoal-isolated]\ndescription = "Read only evidence scratch directory; no credentials or network tools"\n\n[permissions.moneygoal-isolated.filesystem]\n":minimal" = "read"\n${JSON.stringify(resolve(runtimeRoot))} = "read"\n${JSON.stringify(resolve(authHome))} = "deny"\n\n[permissions.moneygoal-isolated.filesystem.":workspace_roots"]\n"." = "read"\n\n[permissions.moneygoal-isolated.network]\nenabled = false\n`;
+ return `cli_auth_credentials_store = "file"\nforced_login_method = "chatgpt"\nweb_search = "disabled"\ndefault_permissions = "moneygoal-isolated"\n\n[permissions.moneygoal-isolated]\ndescription = "Read only evidence scratch directory; no credentials or network tools"\n\n[permissions.moneygoal-isolated.filesystem]\n":minimal" = "read"\n${JSON.stringify(resolve(runtimeRoot))} = "read"\n${JSON.stringify(resolve(authHome))} = "deny"\n\n[permissions.moneygoal-isolated.filesystem.":workspace_roots"]\n"." = "read"\n\n[permissions.moneygoal-isolated.network]\nenabled = false\n`;
 }
 export function runCodex(args,{cwd,env,input,timeoutMs=120000}={}){
  return new Promise((resolvePromise,reject)=>{
@@ -36,7 +37,7 @@ export async function codexStructuredCall({instructions,input,schema,store,confi
  if(JSON.stringify(input).length>config.maxInputCharacters)throw new Error('Evidence packet exceeds input limit');
  if(new Date(config.subscription.reviewDue)<now)throw new Error('Codex usage policy is due for review');
  // Refresh state is encrypted in the existing durable ledger; the secret is a one-time seed.
- const auth=validCodexAuth(store.state.codexAuth??JSON.parse(process.env.CODEX_CONTENT_AUTH_JSON??'null'));
+ const auth=validCodexAuth(store.state.codexAuth??JSON.parse(process.env.CODEX_CONTENT_AUTH_JSON??'null'),config.subscription.accountEmail);
  const record=reserveCodexCall(store.state,config,now);await store.save(store.state);
  const authHome=mkdtempSync(join(tmpdir(),'tmg-codex-auth-'));const workdir=mkdtempSync(join(tmpdir(),'tmg-evidence-'));
  chmodSync(authHome,0o700);chmodSync(workdir,0o700);
@@ -53,7 +54,7 @@ export async function codexStructuredCall({instructions,input,schema,store,confi
   return JSON.parse(readFileSync(output,'utf8'));
  }finally{
   // Persist rotated auth even after a draft fails, before the next serialized request.
-  try{if(existsSync(authPath)){store.state.codexAuth=validCodexAuth(JSON.parse(readFileSync(authPath,'utf8')));await store.save(store.state);}}
+  try{if(existsSync(authPath)){store.state.codexAuth=validCodexAuth(JSON.parse(readFileSync(authPath,'utf8')),config.subscription.accountEmail);await store.save(store.state);}}
   finally{rmSync(authHome,{recursive:true,force:true});rmSync(workdir,{recursive:true,force:true});}
  }
 }

@@ -18,6 +18,10 @@ test('Codex refuses API credentials and any plaintext ledger',async()=>{
  assert.throws(()=>validCodexAuth({auth_mode:'apikey',OPENAI_API_KEY:'test-only'}));
  await assert.rejects(codexStructuredCall({instructions:'test',input:{},schema:{},store:{state:{}},config,now}),/encrypted/);
 });
+test('a seed from a different ChatGPT account cannot be used',()=>{
+ const payload=Buffer.from(JSON.stringify({email:'different@example.invalid'})).toString('base64url');
+ assert.throws(()=>validCodexAuth({...fakeAuth,tokens:{...fakeAuth.tokens,id_token:`header.${payload}.signature`}},'sathya@tastesy.in'),/different account/);
+});
 test('refreshed login survives a failed call and temporary credentials are removed',async()=>{
  process.env.CODEX_RUNTIME_ROOT='/tmp/test-runtime';const store={encrypted:true,state:{codexAuth:fakeAuth},save:async()=>{}};let authHome;
  await assert.rejects(codexStructuredCall({instructions:'test',input:{},schema:{},store,config,now,runner:async(args,options)=>{
