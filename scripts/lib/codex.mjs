@@ -22,6 +22,14 @@ export function codexChildEnvironment(authHome,workdir){
  // Never pass GitHub, state-encryption, API, Google or CJ credentials to the model process.
  return {PATH:process.env.PATH,HOME:workdir,TMPDIR:workdir,LANG:'C.UTF-8',CODEX_HOME:authHome};
 }
+export function codexFailureCategory(text){
+ if(/usage.limit|rate.limit|quota|credits|allowance/i.test(text))return 'account-allowance';
+ if(/model.not.found|unsupported.model|model.*not.*supported/i.test(text))return 'model-availability';
+ if(/bwrap|sandbox|namespace|operation not permitted/i.test(text))return 'sandbox';
+ if(/401|unauthorized|refresh.token|authentication/i.test(text))return 'authentication';
+ if(/unknown field|invalid config|TOML|unrecognized/i.test(text))return 'configuration';
+ return 'runtime';
+}
 export function codexPermissionConfig(authHome,runtimeRoot){
  return `cli_auth_credentials_store = "file"\nforced_login_method = "chatgpt"\nweb_search = "disabled"\ndefault_permissions = "moneygoal-isolated"\n\n[permissions.moneygoal-isolated]\ndescription = "Read only evidence scratch directory; no credentials or network tools"\n\n[permissions.moneygoal-isolated.filesystem]\n":minimal" = "read"\n${JSON.stringify(resolve(runtimeRoot))} = "read"\n${JSON.stringify(resolve(authHome))} = "deny"\n\n[permissions.moneygoal-isolated.filesystem.":workspace_roots"]\n"." = "read"\n\n[permissions.moneygoal-isolated.network]\nenabled = false\n`;
 }
@@ -33,7 +41,7 @@ export function runCodex(args,{cwd,env,input,timeoutMs=120000}={}){
   child.stdout.on('data',b=>{stdout+=b;if(stdout.length>2000000){oversized=true;stop();}});
   child.stderr.on('data',b=>{if(stderr.length<10000)stderr+=b;});
   child.on('error',()=>{clearTimeout(timer);reject(new Error('Codex executable unavailable'));});
-  child.on('close',code=>{clearTimeout(timer);if(code!==0||oversized)reject(new Error('Codex call failed or timed out; draft held. Check account access and allowance.'));else resolvePromise(stdout);});
+  child.on('close',code=>{clearTimeout(timer);if(code!==0||oversized)reject(new Error(`Codex ${codexFailureCategory(stderr+'\n'+stdout)} check failed or timed out; draft held.`));else resolvePromise(stdout);});
   child.stdin.end(input??'');
  });
 }

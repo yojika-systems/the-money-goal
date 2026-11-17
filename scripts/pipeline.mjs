@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { randomUUID,createHash } from 'node:crypto';
 import { articleFiles,readArticle,serializeArticle,normalize } from './lib/content.mjs';
 import { fetchAllowed,collectDocument,parseFeed } from './lib/network.mjs';
-import { stateStore,underWeeklyLimit,shadowReady } from './lib/state.mjs';
+import { stateStore,underWeeklyLimit,shadowReady,hasPublishedArticleToday } from './lib/state.mjs';
 import { structuredCall,draftSchema,verificationSchema,writerInstructions,verifierInstructions } from './lib/model.mjs';
 import { assembleDraft,assertVerified } from './lib/drafting.mjs';
 const config=JSON.parse(readFileSync('automation/config.json','utf8'));
@@ -38,7 +38,7 @@ try{
  if(provider==='openai-api'&&!process.env.OPENAI_API_KEY)throw new Error('OPENAI_API_KEY is not configured; no paid requests made');
  const refreshes=due.map(p=>({id:p.data.translationKey,title:p.data.title,topic:p.data.topic,market:p.data.market,contentType:p.data.contentType,refresh:true,file:p.file,original:p.data,sources:p.data.sources.map(s=>s.url),calculationRefs:p.data.calculationRefs,readerDecision:'Recheck the existing explanation against current primary documents and preserve its reader decision'}));
  const candidates=[...refreshes,...news,...backlog.filter(c=>['editorial','validated'].includes(c.research?.status))];
- const publicationToday=state.published.some(p=>p.date===day&&p.status==='published');
+ const publicationToday=hasPublishedArticleToday(state,day);
  if(publicationToday)throw new Error('Daily publication already completed');
  for(const candidate of candidates){
   if(report.holds.length>=config.maxCandidatesPerRun)break;
