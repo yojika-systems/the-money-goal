@@ -14,6 +14,10 @@ export function reserveCodexCall(state,config,now=new Date()){
  if(record.calls>=config.subscription.maxCallsPerMonth||(record.days[day]??0)>=config.subscription.maxCallsPerDay)throw new Error('Codex subscription call allowance reached');
  record.calls++;record.days[day]=(record.days[day]??0)+1;return record;
 }
+export function hasCodexCapacity(state,config,calls=2,now=new Date()){
+ const record=state.subscriptionUsage?.[now.toISOString().slice(0,7)];
+ return (record?.calls??0)+calls<=config.subscription.maxCallsPerMonth&&(record?.days?.[now.toISOString().slice(0,10)]??0)+calls<=config.subscription.maxCallsPerDay;
+}
 export function selectCodexAuth(state,seed,expectedEmail){
  if(seed){const fingerprint=createHash('sha256').update(seed).digest('hex');if(state.codexSeedFingerprint!==fingerprint){state.codexAuth=validCodexAuth(JSON.parse(seed),expectedEmail);state.codexSeedFingerprint=fingerprint;}}
  return validCodexAuth(state.codexAuth,expectedEmail);
